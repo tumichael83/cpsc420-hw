@@ -1,0 +1,37 @@
+[*]
+[*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
+[*] Tue Jan 24 12:39:58 2023
+[*]
+[dumpfile] "/Users/michaeltu/Desktop/2023 Spring/Cpsc 420/cpsc420-lab1/build/imuldiv-IntMulDivIterative.vcd"
+[dumpfile_mtime] "Tue Jan 24 12:37:07 2023"
+[dumpfile_size] 167996
+[savefile] "/Users/michaeltu/Desktop/2023 Spring/Cpsc 420/cpsc420-lab1/build/template.sav"
+[timestart] 125
+[size] 1391 768
+[pos] -1 -1
+*-1.358454 131 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] tester.
+[treeopen] tester.t0.
+[treeopen] tester.t0.imuldiv.
+[treeopen] tester.t0.imuldiv.imul.
+[treeopen] tester.t0.imuldiv.imul.dpath.
+[sst_width] 193
+[signals_width] 210
+[sst_expanded] 1
+[sst_vpaned_height] 226
+@28
+tester.t0.clk
+tester.t0.reset
+tester.t0.imuldiv.muldivreq_val
+tester.t0.imuldiv.muldivreq_rdy
+tester.t0.imuldiv.muldivreq_msg_fn[2:0]
+@22
+tester.t0.imuldiv.muldivreq_msg_a[31:0]
+tester.t0.imuldiv.muldivreq_msg_b[31:0]
+@28
+tester.t0.imuldiv.muldivresp_val
+tester.t0.imuldiv.muldivresp_rdy
+tester.t0.imuldiv.imul.ctrl.started_count
+tester.t0.imuldiv.imul.dpath.mulreq_val
+[pattern_trace] 1
+[pattern_trace] 0
