@@ -51,96 +51,48 @@ endmodule
 module imuldiv_IntDivIterativeDpath
 (
   input         clk,
-  input         reset,
 
-  input         divreq_msg_fn,      // Function of MulDiv Unit
+  // Data Inputs
   input  [31:0] divreq_msg_a,       // Operand A
   input  [31:0] divreq_msg_b,       // Operand B
-  input         divreq_val,         // Request val Signal
-  output        divreq_rdy,         // Request rdy Signal
 
-  output [63:0] divresp_msg_result, // Result of operation
-  output        divresp_val,        // Response val Signal
-  input         divresp_rdy         // Response rdy Signal
+  // Control Inputs
+  input         cntr_mux_sel_in,
+  input         sign_en_in,
+
+  // Control Outputs
+  output  reg   [4:0] counter,
+  output  reg   div_sign_out;
+  output  reg   rem_sign;
+
+  // Data Outputs
+  output [63:0] divresp_msg_result // Result of operation
 );
+  //------------------------------------------------------------
+  // Counter
+  //------------------------------------------------------------
 
-  //----------------------------------------------------------------------
-  // Sequential Logic
-  //----------------------------------------------------------------------
-
-  reg         fn_reg;      // Register for storing function
-  reg  [31:0] a_reg;       // Register for storing operand A
-  reg  [31:0] b_reg;       // Register for storing operand B
-  reg         val_reg;     // Register for storing valid bit
-
-  always @( posedge clk ) begin
-
-    // Stall the pipeline if the response interface is not ready
-    if ( divresp_rdy ) begin
-      fn_reg  <= divreq_msg_fn;
-      a_reg   <= divreq_msg_a;
-      b_reg   <= divreq_msg_b;
-      val_reg <= divreq_val;
-    end
-
+  always @ ( posedge clk ) begin
+    if (cntr_mux_sel_in)
+      counter <= 5'd31;
+    else
+      counter <= counter - 1;
   end
 
-  //----------------------------------------------------------------------
-  // Combinational Logic
-  //----------------------------------------------------------------------
+  //------------------------------------------------------------
+  // Sign Registers
+  //------------------------------------------------------------
 
-  // Extract sign bits
+  always @ ( posedge clk ) begin
+    if ( sign_en_in ) begin
+        div_sign_reg <= divreq_msg_a[31] ^ divreq_msg_b[31];
+        rem_sign_reg <= divreq_msg_a[31];
+    end
+  end
 
-  wire sign_bit_a = a_reg[31];
-  wire sign_bit_b = b_reg[31];
-
-  // Unsign operands if necessary
-
-  wire [31:0] unsigned_a = ( sign_bit_a ) ? (~a_reg + 1'b1) : a_reg;
-  wire [31:0] unsigned_b = ( sign_bit_b ) ? (~b_reg + 1'b1) : b_reg;
-
-  // Computation logic
-
-  wire [31:0] unsigned_quotient
-    = ( fn_reg == `IMULDIV_DIVREQ_MSG_FUNC_SIGNED )   ? unsigned_a / unsigned_b
-    : ( fn_reg == `IMULDIV_DIVREQ_MSG_FUNC_UNSIGNED ) ? a_reg / b_reg
-    :                                                   32'bx;
-
-  wire [31:0] unsigned_remainder
-    = ( fn_reg == `IMULDIV_DIVREQ_MSG_FUNC_SIGNED )   ? unsigned_a % unsigned_b
-    : ( fn_reg == `IMULDIV_DIVREQ_MSG_FUNC_UNSIGNED ) ? a_reg % b_reg
-    :                                                   32'bx;
-
-  // Determine whether or not result is signed. Usually the result is
-  // signed if one and only one of the input operands is signed. In other
-  // words, the result is signed if the xor of the sign bits of the input
-  // operands is true. Remainder opeartions are a bit trickier, and here
-  // we simply assume that the result is signed if the dividend for the
-  // rem operation is signed.
-
-  wire is_result_signed_div = sign_bit_a ^ sign_bit_b;
-  wire is_result_signed_rem = sign_bit_a;
-
-  // Sign the final results if necessary
-
-  wire [31:0] signed_quotient
-    = ( fn_reg == `IMULDIV_DIVREQ_MSG_FUNC_SIGNED
-     && is_result_signed_div ) ? ~unsigned_quotient + 1'b1
-    :                            unsigned_quotient;
-
-  wire [31:0] signed_remainder
-    = ( fn_reg == `IMULDIV_DIVREQ_MSG_FUNC_SIGNED
-     && is_result_signed_rem )   ? ~unsigned_remainder + 1'b1
-   :                              unsigned_remainder;
-
-  assign divresp_msg_result = { signed_remainder, signed_quotient };
-
-  // Set the val/rdy signals. The request is ready when the response is
-  // ready, and the response is valid when there is valid data in the
-  // input registers.
-
-  assign divreq_rdy  = divresp_rdy;
-  assign divresp_val = val_reg;
+  //------------------------------------------------------------
+  // Sign Registers
+  //------------------------------------------------------------
 
 endmodule
 
@@ -150,7 +102,23 @@ endmodule
 
 module imuldiv_IntDivIterativeCtrl
 (
+  input           clk,
+  input           reset,
+
+  input           divreq_msg_fn,
+
+  input           divreq_val,
+  input           divrsp_rdy,
+
+  output          divrsp_val,
+  output          divreq_rdy
 );
+
+  always @ (posedge clk) begin
+    if ( divresp_rdy ) begin
+
+    end
+  end
 
 endmodule
 
