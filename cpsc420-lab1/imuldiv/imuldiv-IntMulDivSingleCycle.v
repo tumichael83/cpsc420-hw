@@ -71,7 +71,7 @@ module imuldiv_IntMulDivSingleCycle
   // Determine whether or not result is signed. Usually the result is
   // signed if one and only one of the input operands is signed. In other
   // words, the result is signed if the xor of the sign bits of the input
-  // operands is true. Remainder opeartions are a bit trickier, and here
+  // operands is true. Remainder operations are a bit trickier, and here
   // we simply assume that the result is signed if the dividend for the
   // rem operation is signed.
 
