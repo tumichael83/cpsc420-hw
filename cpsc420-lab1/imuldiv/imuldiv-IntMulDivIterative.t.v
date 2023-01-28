@@ -159,6 +159,9 @@ module tester;
     t0.src.m[ 7] = 65'h1_f5fe4fbc_ffffb14a; t0.sink.m[ 7] = 64'hffffcc8e_0000208b;
 
     // Add entries for divu/remu here
+    t0.src.m[ 8] = 67'h2_00000000_00000001; t0.sink.m[ 8] = 64'h00000000_00000000;
+    t0.src.m[ 9] = 67'h2_00000009_00000002; t0.sink.m[ 9] = 64'h00000001_00000004;
+    t0.src.m[10] = 67'h2_00000001_ffffffff; t0.sink.m[10] = 64'h00000001_00000000;  // this testcase is failing, but not on the binary
 
     #5;   t0_reset = 1'b1;
     #20;  t0_reset = 1'b0;
