@@ -381,7 +381,6 @@ module imuldiv_IntMulIterativeCtrl
         else
           add_mux_sel_out = 1'b1;
 
-        sign_mux_sel_out = 1'b0;
         sign_en_out = 1'b0;
         mulresp_val = 1'b0;
         end

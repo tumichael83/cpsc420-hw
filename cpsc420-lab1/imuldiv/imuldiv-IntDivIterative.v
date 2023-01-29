@@ -27,6 +27,8 @@ module imuldiv_IntDivIterative
 );
 
   wire         cntr_mux_sel;
+  wire         fn_sign_reg_en;
+  wire         fn_sign;
   wire         sign_en;
   wire         is_op_signed;
   wire         a_mux_sel;
@@ -43,9 +45,12 @@ module imuldiv_IntDivIterative
   imuldiv_IntDivIterativeDpath dpath
   (
     .clk                  (clk),
+    .divreq_msg_fn        (divreq_msg_fn),
     .divreq_msg_a         (divreq_msg_a),
     .divreq_msg_b         (divreq_msg_b),
     .cntr_mux_sel_in      (cntr_mux_sel),
+    .fn_sign_reg_en_in    (fn_sign_reg_en),
+    .fn_sign_out          (fn_sign),
     .sign_en_in           (sign_en),
     .is_op_signed_in      (is_op_signed),
     .a_mux_sel_in         (a_mux_sel),
@@ -66,18 +71,19 @@ module imuldiv_IntDivIterative
     .clk                  (clk),
     .reset                (reset),
 
-    .divreq_msg_fn        (divreq_msg_fn),
     .divreq_val           (divreq_val),
     .divresp_rdy          (divresp_rdy),
     .divresp_val          (divresp_val),
     .divreq_rdy           (divreq_rdy),
 
     .counter_in           (counter),
+    .fn_sign_in          (fn_sign),
     .div_sign_in          (div_sign),
     .rem_sign_in          (rem_sign),
     .diff_sign_in         (diff_sign),
 
     .cntr_mux_sel_out     (cntr_mux_sel),
+    .fn_sign_reg_en_out   (fn_sign_reg_en),
     .sign_en_out          (sign_en),
     .is_op_signed_out     (is_op_signed),
     .a_mux_sel_out        (a_mux_sel),
@@ -99,11 +105,13 @@ module imuldiv_IntDivIterativeDpath
   input         clk,
 
   // Data Inputs
+  input         divreq_msg_fn,       // Signed
   input  [31:0] divreq_msg_a,       // Operand A
   input  [31:0] divreq_msg_b,       // Operand B
 
   // Control Inputs (ctrl->dpath)
   input         cntr_mux_sel_in,
+  input         fn_sign_reg_en_in,
   input         sign_en_in,
   input         is_op_signed_in,
   input         a_mux_sel_in,
@@ -115,6 +123,7 @@ module imuldiv_IntDivIterativeDpath
 
   // Control Outputs (dpath->ctrl)
   output reg   [4:0] counter_out,
+  output             fn_sign_out,
   output             div_sign_out,
   output             rem_sign_out,
   output             diff_sign_out,
@@ -136,6 +145,14 @@ module imuldiv_IntDivIterativeDpath
   //------------------------------------------------------------
   // Sign Registers
   //------------------------------------------------------------
+
+  vc_EDFF_pf#(1)  fn_sign_reg
+  (
+    .clk        (clk),
+    .d_p        (divreq_msg_fn),
+    .en_p       (fn_sign_reg_en_in),
+    .q_np       (fn_sign_out)
+  );
 
   vc_EDFF_pf#(1)  div_sign_reg
   (
@@ -261,8 +278,6 @@ module imuldiv_IntDivIterativeCtrl
   input           reset,
 
   // Data inputs / outputs
-  input           divreq_msg_fn,
-
   input           divreq_val,
   input           divresp_rdy,
 
@@ -271,14 +286,16 @@ module imuldiv_IntDivIterativeCtrl
 
   // Control inputs  (dpath -> ctrl)
   input     [4:0] counter_in,
+  input           fn_sign_in,
   input           div_sign_in,
   input           rem_sign_in,
   input           diff_sign_in,
 
   // Control Outputs (ctrl -> dpth)
-  output  reg     cntr_mux_sel_out, //
-  output  reg     sign_en_out,      //
-  output          is_op_signed_out,  //
+  output  reg     cntr_mux_sel_out,
+  output  reg     fn_sign_reg_en_out,
+  output  reg     sign_en_out,      
+  output  reg     is_op_signed_out, 
   output  reg     a_mux_sel_out,
   output  reg     a_en_out,  
   output  reg     b_en_out, 
@@ -334,13 +351,17 @@ module imuldiv_IntDivIterativeCtrl
   //---------------------
 
   // think about this one some more
-  assign is_op_signed_out = divreq_msg_fn;
 
   always @ ( * ) begin
+    if (fn_sign_in)
+      is_op_signed_out = 1'b1;
+    else
+      is_op_signed_out = 1'b0;
     case ( state )
       WAIT : begin
         divreq_rdy = 1'b1;
         cntr_mux_sel_out = 1'b1;
+        fn_sign_reg_en_out = 1'b1;
         sign_en_out = 1'b1;
         a_mux_sel_out = 1'b1;
         a_en_out = 1'b1;
@@ -351,6 +372,7 @@ module imuldiv_IntDivIterativeCtrl
       CALC : begin
         divreq_rdy = 1'b0;
         cntr_mux_sel_out = 1'b0;
+        fn_sign_reg_en_out = 1'b0;
         sign_en_out = 1'b0;
         a_mux_sel_out = 1'b0;
         a_en_out = 1'b1;
@@ -362,33 +384,24 @@ module imuldiv_IntDivIterativeCtrl
         else
           sub_mux_sel_out = 1'b1;
 
-        if (rem_sign_in)
-          rem_sign_mux_sel_out = 1'b0;
-        else
-          rem_sign_mux_sel_out = 1'b1;
-
-        if (div_sign_in)
-          div_sign_mux_sel_out = 1'b0;
-        else
-          div_sign_mux_sel_out = 1'b1;
-
         divresp_val = 1'b0;
       end
 
       DONE : begin
         divreq_rdy = 1'b0;
         cntr_mux_sel_out = 1'b1;
+        fn_sign_reg_en_out = 1'b0;
         sign_en_out = 1'b0;
         a_en_out = 1'b0;
         b_en_out = 1'b0;
 
-        // output mux should hold constant
-        if (rem_sign_in)
+        // output reg should be holding constant
+        if (rem_sign_in && fn_sign_in)
           rem_sign_mux_sel_out = 1'b0;
         else
           rem_sign_mux_sel_out = 1'b1;
 
-        if (div_sign_in)
+        if (div_sign_in && fn_sign_in)
           div_sign_mux_sel_out = 1'b0;
         else
           div_sign_mux_sel_out = 1'b1;

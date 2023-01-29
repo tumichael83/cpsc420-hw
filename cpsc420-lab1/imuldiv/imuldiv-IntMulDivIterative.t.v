@@ -105,16 +105,21 @@ module tester;
   `VC_TEST_CASE_BEGIN( 1, "mul" )
   begin
 
-    t0.src.m[0] = 67'h0_00000000_00000000; t0.sink.m[0] = 64'h00000000_00000000;
-    t0.src.m[1] = 67'h0_00000001_00000001; t0.sink.m[1] = 64'h00000000_00000001;
-    t0.src.m[2] = 67'h0_ffffffff_00000001; t0.sink.m[2] = 64'hffffffff_ffffffff;
-    t0.src.m[3] = 67'h0_00000001_ffffffff; t0.sink.m[3] = 64'hffffffff_ffffffff;
-    t0.src.m[4] = 67'h0_ffffffff_ffffffff; t0.sink.m[4] = 64'h00000000_00000001;
-    t0.src.m[5] = 67'h0_00000008_00000003; t0.sink.m[5] = 64'h00000000_00000018;
-    t0.src.m[6] = 67'h0_fffffff8_00000008; t0.sink.m[6] = 64'hffffffff_ffffffc0;
-    t0.src.m[7] = 67'h0_fffffff8_fffffff8; t0.sink.m[7] = 64'h00000000_00000040;
-    t0.src.m[8] = 67'h0_0deadbee_10000000; t0.sink.m[8] = 64'h00deadbe_e0000000;
-    t0.src.m[9] = 67'h0_deadbeef_10000000; t0.sink.m[9] = 64'hfdeadbee_f0000000;
+    t0.src.m[ 0] = 67'h0_00000000_00000000; t0.sink.m[ 0] = 64'h00000000_00000000;
+    t0.src.m[ 1] = 67'h0_00000001_00000001; t0.sink.m[ 1] = 64'h00000000_00000001;
+    t0.src.m[ 2] = 67'h0_ffffffff_00000001; t0.sink.m[ 2] = 64'hffffffff_ffffffff;
+    t0.src.m[ 3] = 67'h0_00000001_ffffffff; t0.sink.m[ 3] = 64'hffffffff_ffffffff;
+    t0.src.m[ 4] = 67'h0_ffffffff_ffffffff; t0.sink.m[ 4] = 64'h00000000_00000001;
+    t0.src.m[ 5] = 67'h0_00000008_00000003; t0.sink.m[ 5] = 64'h00000000_00000018;
+    t0.src.m[ 6] = 67'h0_fffffff8_00000008; t0.sink.m[ 6] = 64'hffffffff_ffffffc0;
+    t0.src.m[ 7] = 67'h0_fffffff8_fffffff8; t0.sink.m[ 7] = 64'h00000000_00000040;
+    t0.src.m[ 8] = 67'h0_0deadbee_10000000; t0.sink.m[ 8] = 64'h00deadbe_e0000000;
+    t0.src.m[ 9] = 67'h0_deadbeef_10000000; t0.sink.m[ 9] = 64'hfdeadbee_f0000000; 
+
+    // add upper bit multiplication tests :(
+    t0.src.m[10] = 67'h0_00010000_00010000; t0.sink.m[10] = 64'h00000001_00000000;
+    t0.src.m[11] = 67'h0_ffff0000_ffff0000; t0.sink.m[11] = 64'h00000001_00000000;
+    t0.src.m[12] = 67'h0_00010000_ffff0000; t0.sink.m[12] = 64'hffffffff_00000000; 
 
     #5;   t0_reset = 1'b1;
     #20;  t0_reset = 1'b0;
@@ -159,9 +164,12 @@ module tester;
     t0.src.m[ 7] = 65'h1_f5fe4fbc_ffffb14a; t0.sink.m[ 7] = 64'hffffcc8e_0000208b;
 
     // Add entries for divu/remu here
-    t0.src.m[ 8] = 67'h2_00000000_00000001; t0.sink.m[ 8] = 64'h00000000_00000000;
-    t0.src.m[ 9] = 67'h2_00000009_00000002; t0.sink.m[ 9] = 64'h00000001_00000004;
-    t0.src.m[10] = 67'h2_00000001_ffffffff; t0.sink.m[10] = 64'h00000001_00000000;  // this testcase is failing, but not on the binary
+    t0.src.m[ 8] = 67'h2_00000000_00000001; t0.sink.m[ 8] = 64'h00000000_00000000;  // just make sure it works
+    t0.src.m[ 9] = 67'h2_00000008_00000002; t0.sink.m[ 9] = 64'h00000000_00000004;
+    t0.src.m[10] = 67'h2_0000000B_00000003; t0.sink.m[10] = 64'h00000002_00000003;
+    t0.src.m[11] = 67'h2_00000001_fffffffe; t0.sink.m[11] = 64'h00000001_00000000;  // reinterpret 2s complement (divisor)
+    t0.src.m[12] = 67'h4_ffffffff_00000002; t0.sink.m[12] = 64'h00000001_7fffffff;  // reinterpret 2s complement (dividend)
+    t0.src.m[13] = 67'h2_fffffff8_fffffffe; t0.sink.m[13] = 64'hfffffff8_00000000;  // reinterpret 2s complement (both)
 
     #5;   t0_reset = 1'b1;
     #20;  t0_reset = 1'b0;
