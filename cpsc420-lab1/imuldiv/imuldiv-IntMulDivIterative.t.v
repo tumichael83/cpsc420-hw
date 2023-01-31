@@ -182,6 +182,28 @@ module tester;
    // Add More Test Cases Here
    //---------------------------------------------------------------------
 
-  `VC_TEST_SUITE_END( 3 /* replace with number of test cases */ )
+  `VC_TEST_CASE_BEGIN( 4, "alternate" )
+  begin
+
+    t0.src.m[ 0] = 67'h0_fffffff8_00000008; t0.sink.m[ 0] = 64'hffffffff_ffffffc0;
+    t0.src.m[ 1] = 67'h2_00000001_fffffffe; t0.sink.m[ 1] = 64'h00000001_00000000;  // reinterpret 2s complement (divisor)
+    t0.src.m[ 2] = 67'h0_fffffff8_fffffff8; t0.sink.m[ 2] = 64'h00000000_00000040;
+    t0.src.m[ 3] = 67'h0_0deadbee_10000000; t0.sink.m[ 3] = 64'h00deadbe_e0000000;
+    t0.src.m[ 4] = 67'h2_fffffff8_fffffffe; t0.sink.m[ 4] = 64'hfffffff8_00000000;  // reinterpret 2s complement (both)
+    t0.src.m[ 5] = 67'h0_deadbeef_10000000; t0.sink.m[ 5] = 64'hfdeadbee_f0000000;
+    t0.src.m[ 6] = 65'h1_0a01b044_ffffb14a; t0.sink.m[ 6] = 64'h00003372_ffffdf75;
+    t0.src.m[ 7] = 65'h1_deadbeef_0000beef; t0.sink.m[ 7] = 64'hffffda72_ffffd353; 
+    t0.src.m[ 8] = 65'h1_f5fe4fbc_00004eb6; t0.sink.m[ 8] = 64'hffffcc8e_ffffdf75;
+    t0.src.m[ 9] = 67'h4_ffffffff_00000002; t0.sink.m[ 9] = 64'h00000001_7fffffff;  // reinterpret 2s complement (dividend) FAILED
+    t0.src.m[10] = 65'h1_f5fe4fbc_ffffb14a; t0.sink.m[10] = 64'hffffcc8e_0000208b;
+
+    #5;   t0_reset = 1'b1;
+    #20;  t0_reset = 1'b0;
+    #10000; `VC_TEST_CHECK( "Is sink finished?", t0_done )
+
+  end
+  `VC_TEST_CASE_END
+
+  `VC_TEST_SUITE_END( 4 /* replace with number of test cases */ )
 
 endmodule

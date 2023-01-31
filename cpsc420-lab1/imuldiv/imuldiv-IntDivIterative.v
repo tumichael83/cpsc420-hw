@@ -353,10 +353,6 @@ module imuldiv_IntDivIterativeCtrl
   // think about this one some more
 
   always @ ( * ) begin
-    if (fn_sign_in)
-      is_op_signed_out = 1'b1;
-    else
-      is_op_signed_out = 1'b0;
     case ( state )
       WAIT : begin
         divreq_rdy = 1'b1;
@@ -394,6 +390,7 @@ module imuldiv_IntDivIterativeCtrl
         sign_en_out = 1'b0;
         a_en_out = 1'b0;
         b_en_out = 1'b0;
+        fn_sign_reg_en_out = 1'b1;
 
         // output reg should be holding constant
         if (rem_sign_in && fn_sign_in)
@@ -408,8 +405,11 @@ module imuldiv_IntDivIterativeCtrl
 
         divresp_val = 1'b1;
       end
-
     endcase
+    if (fn_sign_in)
+      is_op_signed_out = 1'b1;
+    else
+      is_op_signed_out = 1'b0;
   end
 
 endmodule
