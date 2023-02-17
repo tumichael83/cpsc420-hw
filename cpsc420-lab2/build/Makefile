@@ -64,6 +64,7 @@ tests = \
   parcv2-xori.vmh \
   parcv2-sll.vmh \
   parcv2-srl.vmh \
+  parcv2-sra.vmh \
 
 pv2stall_rtl_sim = pv2stall-sim
 pv2stall_rtl_rand_sim = pv2stall-randdelay-sim
