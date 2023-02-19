@@ -532,13 +532,35 @@ module parc_CoreCtrl
 
 
   // Bypass output signals
-  assign rs_X_byp_Dhl = rs_addr_Dhl == rf_waddr_Xhl;
-  assign rs_M_byp_Dhl = rs_addr_Dhl == rf_waddr_Mhl;
-  assign rs_W_byp_Dhl = rs_addr_Dhl == rf_waddr_Whl;
-  assign rt_X_byp_Dhl = rt_addr_Dhl == rf_waddr_Xhl;
-  assign rt_M_byp_Dhl = rt_addr_Dhl == rf_waddr_Mhl;
-  assign rt_W_byp_Dhl = rt_addr_Dhl == rf_waddr_Whl;
-  
+  assign rs_X_byp_Dhl = inst_val_Dhl &&
+                            ( rs_en_Dhl && inst_val_Xhl && rf_wen_Xhl
+                              && ( rs_addr_Dhl == rf_waddr_Xhl )
+                              && ( rf_waddr_Xhl != 5'd0 ) );
+
+  assign rs_M_byp_Dhl = inst_val_Dhl &&
+                            ( rs_en_Dhl && inst_val_Mhl && rf_wen_Mhl
+                              && ( rs_addr_Dhl == rf_waddr_Mhl )
+                              && ( rf_waddr_Mhl != 5'd0 ) );
+
+  assign rs_W_byp_Dhl = inst_val_Dhl &&
+                            ( rs_en_Dhl && inst_val_Whl && rf_wen_Whl
+                              && ( rs_addr_Dhl == rf_waddr_Whl )
+                              && ( rf_waddr_Whl != 5'd0 ) );
+
+  assign rt_X_byp_Dhl = inst_val_Dhl &&
+                            ( rt_en_Dhl && inst_val_Xhl && rf_wen_Xhl
+                              && ( rt_addr_Dhl == rf_waddr_Xhl )
+                              && ( rf_waddr_Xhl != 5'd0 ) );
+
+  assign rt_M_byp_Dhl = inst_val_Dhl &&
+                            ( rt_en_Dhl && inst_val_Mhl && rf_wen_Mhl
+                              && ( rt_addr_Dhl == rf_waddr_Mhl )
+                              && ( rf_waddr_Mhl != 5'd0 ) );
+
+  assign rt_W_byp_Dhl = inst_val_Dhl &&
+                            ( rt_en_Dhl && inst_val_Whl && rf_wen_Whl
+                              && ( rt_addr_Dhl == rf_waddr_Whl )
+                              && ( rf_waddr_Whl != 5'd0 ) );
 
   // Next bubble bit
 

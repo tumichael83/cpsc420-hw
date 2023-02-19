@@ -80,6 +80,13 @@ module parc_Core
   wire        branch_cond_neg_Xhl;
   wire [31:0] proc2cop_data_Whl;
 
+  wire         rs_X_byp_Dhl;   // these are signals for selecting bypass
+  wire         rs_M_byp_Dhl;
+  wire         rs_W_byp_Dhl;
+  wire         rt_X_byp_Dhl;
+  wire         rt_M_byp_Dhl;
+  wire         rt_W_byp_Dhl;
+
   //----------------------------------------------------------------------
   // Pack Memory Request Messages
   //----------------------------------------------------------------------
@@ -171,6 +178,13 @@ module parc_Core
     .stall_Xhl              (stall_Xhl),
     .stall_Mhl              (stall_Mhl),
     .stall_Whl              (stall_Whl),
+    
+    .rs_X_byp_Dhl           (rs_X_byp_Dhl),
+    .rs_M_byp_Dhl           (rs_M_byp_Dhl),
+    .rs_W_byp_Dhl           (rs_W_byp_Dhl),
+    .rt_X_byp_Dhl           (rt_X_byp_Dhl),
+    .rt_M_byp_Dhl           (rt_M_byp_Dhl),
+    .rt_W_byp_Dhl           (rt_W_byp_Dhl),
 
     // Control Signals (dpath->ctrl)
 
@@ -228,6 +242,13 @@ module parc_Core
     .stall_Xhl               (stall_Xhl),
     .stall_Mhl               (stall_Mhl),
     .stall_Whl               (stall_Whl),
+
+    .rs_X_byp_Dhl           (rs_X_byp_Dhl),
+    .rs_M_byp_Dhl           (rs_M_byp_Dhl),
+    .rs_W_byp_Dhl           (rs_W_byp_Dhl),
+    .rt_X_byp_Dhl           (rt_X_byp_Dhl),
+    .rt_M_byp_Dhl           (rt_M_byp_Dhl),
+    .rt_W_byp_Dhl           (rt_W_byp_Dhl),
 
     // Control Signals (dpath->ctrl)
 
