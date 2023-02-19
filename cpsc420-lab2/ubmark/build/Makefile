@@ -84,7 +84,7 @@ LDFLAGS     :=
 
 # C compiler and linker
 
-CC          := maven-gcc
+CC          := maven-gcc -std=gnu99
 COMPILE_C   := $(CC) $(CFLAGS) -funroll-loops -MMD -MP -I. $(CPPFLAGS)
 LD_C        := $(CC)
 LINK_C      := $(LD_C) -L. $(LDFLAGS)
@@ -109,7 +109,7 @@ RUNFLAGS    :=
 # Installation
 
 MKINSTALLDIRS := $(scripts_dir)/mk-install-dirs.sh
-INSTALL       := /usr/bin//install -c
+INSTALL       := /usr/bin/install -c
 INSTALL_HDR   := $(INSTALL) -m 444
 INSTALL_LIB   := $(INSTALL) -m 644
 INSTALL_EXE   := $(INSTALL) -m 555
