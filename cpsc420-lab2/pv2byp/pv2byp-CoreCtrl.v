@@ -504,6 +504,8 @@ module parc_CoreCtrl
   // Stall for data hazards if either of the operand read addresses are
   // the same as the write addresses of instruction later in the pipeline
 
+
+  // change stall to load only! <-- temporarily disabled
   wire stall_hazard_Dhl   = inst_val_Dhl && (
                             ( rs_en_Dhl && inst_val_Xhl && rf_wen_Xhl
                               && ( rs_addr_Dhl == rf_waddr_Xhl )
@@ -527,11 +529,13 @@ module parc_CoreCtrl
   // Aggregate Stall Signal
 
   assign stall_Dhl = ( stall_Xhl
-                  ||   stall_muldiv_Dhl
-                  ||   stall_hazard_Dhl );
+                  ||   stall_muldiv_Dhl );
+                  //||   stall_hazard_Dhl );
 
 
-  // Bypass output signals
+  // Bypass Signals
+  // if rs_[stage]_byp_Dhl is true, it means we need the value of rs from [stage]
+
   assign rs_X_byp_Dhl = inst_val_Dhl &&
                             ( rs_en_Dhl && inst_val_Xhl && rf_wen_Xhl
                               && ( rs_addr_Dhl == rf_waddr_Xhl )

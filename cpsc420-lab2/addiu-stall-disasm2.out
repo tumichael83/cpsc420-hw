@@ -1,4 +1,4 @@
-WARNING: ../pv2byp/pv2byp-sim.v:154: $readmemh: Standard inconsistency, following 1364-2005.
+WARNING: ../pv2stall/pv2stall-sim.v:154: $readmemh: Standard inconsistency, following 1364-2005.
 00080000: 24020000: addiu r 2, r 0, 0000 
 r00=xxxxxxxx r01=xxxxxxxx r02=00000000 r03=xxxxxxxx r04=xxxxxxxx r05=xxxxxxxx
 r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx

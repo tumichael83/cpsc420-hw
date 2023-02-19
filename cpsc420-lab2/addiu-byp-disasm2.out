@@ -1,0 +1,260 @@
+WARNING: ../pv2byp/pv2byp-sim.v:154: $readmemh: Standard inconsistency, following 1364-2005.
+VCD info: dumpfile ../tests/build/vmh/parcv1-addiu.vcd opened for output.
+00080000: 24020000: addiu r 2, r 0, 0000 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000000 r03=xxxxxxxx r04=xxxxxxxx r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=xxxxxxxx
+r30=xxxxxxxx r31=xxxxxxxx
+-----
+00080004: 24440000: addiu r 4, r 2, 0000 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000000 r03=xxxxxxxx r04=00000000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=xxxxxxxx
+r30=xxxxxxxx r31=xxxxxxxx
+-----
+00080008: 241d000d: addiu r29, r 0, 000d 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000000 r03=xxxxxxxx r04=00000000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=0000000d
+r30=xxxxxxxx r31=xxxxxxxx
+-----
+0008000c: 14800075: bne   r 4, r 0, 0075 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000000 r03=xxxxxxxx r04=00000000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=0000000d
+r30=xxxxxxxx r31=xxxxxxxx
+-----
+00080010: 24020001: addiu r 2, r 0, 0001 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000001 r03=xxxxxxxx r04=00000000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=0000000d
+r30=xxxxxxxx r31=xxxxxxxx
+-----
+00080014: 24440001: addiu r 4, r 2, 0001 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000001 r03=xxxxxxxx r04=00000002 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=0000000d
+r30=xxxxxxxx r31=xxxxxxxx
+-----
+00080018: 241d000e: addiu r29, r 0, 000e 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000001 r03=xxxxxxxx r04=00000002 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=0000000e
+r30=xxxxxxxx r31=xxxxxxxx
+-----
+0008001c: 241e0002: addiu r30, r 0, 0002 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000001 r03=xxxxxxxx r04=00000002 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=0000000e
+r30=00000002 r31=xxxxxxxx
+-----
+00080020: 149e0070: bne   r 4, r30, 0070 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000001 r03=xxxxxxxx r04=00000002 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=0000000e
+r30=00000002 r31=xxxxxxxx
+-----
+00080024: 24020003: addiu r 2, r 0, 0003 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000003 r03=xxxxxxxx r04=00000002 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=0000000e
+r30=00000002 r31=xxxxxxxx
+-----
+00080028: 24440007: addiu r 4, r 2, 0007 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000003 r03=xxxxxxxx r04=0000000a r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=0000000e
+r30=00000002 r31=xxxxxxxx
+-----
+0008002c: 241d000f: addiu r29, r 0, 000f 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000003 r03=xxxxxxxx r04=0000000a r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=0000000f
+r30=00000002 r31=xxxxxxxx
+-----
+00080030: 241e000a: addiu r30, r 0, 000a 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000003 r03=xxxxxxxx r04=0000000a r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=0000000f
+r30=0000000a r31=xxxxxxxx
+-----
+00080034: 149e006b: bne   r 4, r30, 006b 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000003 r03=xxxxxxxx r04=0000000a r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=0000000f
+r30=0000000a r31=xxxxxxxx
+-----
+00080038: 24020000: addiu r 2, r 0, 0000 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000000 r03=xxxxxxxx r04=0000000a r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=0000000f
+r30=0000000a r31=xxxxxxxx
+-----
+0008003c: 24448000: addiu r 4, r 2, 8000 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000000 r03=xxxxxxxx r04=ffff8000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=0000000f
+r30=0000000a r31=xxxxxxxx
+-----
+00080040: 241d0011: addiu r29, r 0, 0011 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000000 r03=xxxxxxxx r04=ffff8000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=00000011
+r30=0000000a r31=xxxxxxxx
+-----
+00080044: 241e8000: addiu r30, r 0, 8000 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000000 r03=xxxxxxxx r04=ffff8000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=00000011
+r30=ffff8000 r31=xxxxxxxx
+-----
+00080048: 149e0066: bne   r 4, r30, 0066 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000000 r03=xxxxxxxx r04=ffff8000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=00000011
+r30=ffff8000 r31=xxxxxxxx
+-----
+0008004c: 3c028000: lui   r 2, 8000      
+r00=xxxxxxxx r01=xxxxxxxx r02=80000000 r03=xxxxxxxx r04=ffff8000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=00000011
+r30=ffff8000 r31=xxxxxxxx
+-----
+00080050: 24440000: addiu r 4, r 2, 0000 
+r00=xxxxxxxx r01=xxxxxxxx r02=80000000 r03=xxxxxxxx r04=80000000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=00000011
+r30=ffff8000 r31=xxxxxxxx
+-----
+00080054: 241d0012: addiu r29, r 0, 0012 
+r00=xxxxxxxx r01=xxxxxxxx r02=80000000 r03=xxxxxxxx r04=80000000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=00000012
+r30=ffff8000 r31=xxxxxxxx
+-----
+00080058: 3c1e8000: lui   r30, 8000      
+r00=xxxxxxxx r01=xxxxxxxx r02=80000000 r03=xxxxxxxx r04=80000000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=00000012
+r30=80000000 r31=xxxxxxxx
+-----
+0008005c: 149e0061: bne   r 4, r30, 0061 
+r00=xxxxxxxx r01=xxxxxxxx r02=80000000 r03=xxxxxxxx r04=80000000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=00000012
+r30=80000000 r31=xxxxxxxx
+-----
+00080060: 3c028000: lui   r 2, 8000      
+r00=xxxxxxxx r01=xxxxxxxx r02=80000000 r03=xxxxxxxx r04=80000000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=00000012
+r30=80000000 r31=xxxxxxxx
+-----
+00080064: 24448000: addiu r 4, r 2, 8000 
+r00=xxxxxxxx r01=xxxxxxxx r02=80000000 r03=xxxxxxxx r04=7fff8000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=00000012
+r30=80000000 r31=xxxxxxxx
+-----
+00080068: 241d0013: addiu r29, r 0, 0013 
+r00=xxxxxxxx r01=xxxxxxxx r02=80000000 r03=xxxxxxxx r04=7fff8000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=00000013
+r30=80000000 r31=xxxxxxxx
+-----
+0008006c: 3c1e7fff: lui   r30, 7fff      
+r00=xxxxxxxx r01=xxxxxxxx r02=80000000 r03=xxxxxxxx r04=7fff8000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=00000013
+r30=7fff0000 r31=xxxxxxxx
+-----
+00080070: 37de8000: ori   r30, r30, 8000 
+r00=xxxxxxxx r01=xxxxxxxx r02=80000000 r03=xxxxxxxx r04=7fff8000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=00000013
+r30=7fff8000 r31=xxxxxxxx
+-----
+00080074: 149e005b: bne   r 4, r30, 005b 
+r00=xxxxxxxx r01=xxxxxxxx r02=80000000 r03=xxxxxxxx r04=7fff8000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=00000013
+r30=7fff8000 r31=xxxxxxxx
+-----
+000801e4: 24020001: addiu r 2, r 0, 0001 
+r00=xxxxxxxx r01=xxxxxxxx r02=00000001 r03=xxxxxxxx r04=7fff8000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=00000013
+r30=7fff8000 r31=xxxxxxxx
+-----
+*** FAILED *** (status =         19)
+000801e8: 409da800: mtc0  r29, r21       
+r00=xxxxxxxx r01=xxxxxxxx r02=00000001 r03=xxxxxxxx r04=7fff8000 r05=xxxxxxxx
+r06=xxxxxxxx r07=xxxxxxxx r08=xxxxxxxx r09=xxxxxxxx r10=xxxxxxxx r11=xxxxxxxx
+r12=xxxxxxxx r13=xxxxxxxx r14=xxxxxxxx r15=xxxxxxxx r16=xxxxxxxx r17=xxxxxxxx
+r18=xxxxxxxx r19=xxxxxxxx r20=xxxxxxxx r21=xxxxxxxx r22=xxxxxxxx r23=xxxxxxxx
+r24=xxxxxxxx r25=xxxxxxxx r26=xxxxxxxx r27=xxxxxxxx r28=xxxxxxxx r29=00000013
+r30=7fff8000 r31=xxxxxxxx
+-----
+000801ec: 1402ffff: bne   r 0, r 2, ffff 
