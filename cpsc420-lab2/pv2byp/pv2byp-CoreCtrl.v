@@ -52,6 +52,13 @@ module parc_CoreCtrl
   output        stall_Mhl,
   output        stall_Whl,
 
+  output         rs_X_byp_Dhl,
+  output         rs_M_byp_Dhl,
+  output         rs_W_byp_Dhl,
+  output         rt_X_byp_Dhl,
+  output         rt_M_byp_Dhl,
+  output         rt_W_byp_Dhl,
+
   // Control Signals (dpath->ctrl)
 
   input         branch_cond_eq_Xhl,
@@ -483,7 +490,7 @@ module parc_CoreCtrl
   wire [4:0] cp0_addr_Dhl = inst_rd_Dhl;
 
   //----------------------------------------------------------------------
-  // Squash and Stall Logic
+  // Squash, Stall, and Bypass Logic
   //----------------------------------------------------------------------
 
   // Squash instruction in D if a valid branch in X is taken
@@ -522,6 +529,16 @@ module parc_CoreCtrl
   assign stall_Dhl = ( stall_Xhl
                   ||   stall_muldiv_Dhl
                   ||   stall_hazard_Dhl );
+
+
+  // Bypass output signals
+  assign rs_X_byp_Dhl = rs_addr_Dhl == rf_waddr_Xhl;
+  assign rs_M_byp_Dhl = rs_addr_Dhl == rf_waddr_Mhl;
+  assign rs_W_byp_Dhl = rs_addr_Dhl == rf_waddr_Whl;
+  assign rt_X_byp_Dhl = rt_addr_Dhl == rf_waddr_Xhl;
+  assign rt_M_byp_Dhl = rt_addr_Dhl == rf_waddr_Mhl;
+  assign rt_W_byp_Dhl = rt_addr_Dhl == rf_waddr_Whl;
+  
 
   // Next bubble bit
 
