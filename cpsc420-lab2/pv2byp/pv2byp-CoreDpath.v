@@ -51,6 +51,15 @@ module parc_CoreDpath
   input         stall_Mhl,
   input         stall_Whl,
 
+  // Bypass Control Signals (ctrl->dpath)
+  
+  input         rs_X_byp_Dhl,   // these are signals for selecting bypass
+  input         rs_M_byp_Dhl,
+  input         rs_W_byp_Dhl,
+  input         rt_X_byp_Dhl,
+  input         rt_M_byp_Dhl,
+  input         rt_W_byp_Dhl,
+
   // Control Signals (dpath->ctrl)
 
   output        branch_cond_eq_Xhl,
@@ -184,7 +193,10 @@ module parc_CoreDpath
   // Operand 0 mux
 
   wire [31:0] op0_mux_out_Dhl
-    = ( op0_mux_sel_Dhl == 2'd0 ) ? rf_rdata0_Dhl
+    = ( rs_W_byp_Dhl )            ? wb_mux_out_Whl              // bypass
+    : ( rs_M_byp_Dhl )            ? dmemresp_queue_mux_out_Mhl
+    : ( rs_X_byp_Dhl )            ? execute_mux_out_Mhl
+    : ( op0_mux_sel_Dhl == 2'd0 ) ? rf_rdata0_Dhl
     : ( op0_mux_sel_Dhl == 2'd1 ) ? shamt_Dhl
     : ( op0_mux_sel_Dhl == 2'd2 ) ? const16
     : ( op0_mux_sel_Dhl == 2'd3 ) ? const0
@@ -193,7 +205,10 @@ module parc_CoreDpath
   // Operand 1 mux
 
   wire [31:0] op1_mux_out_Dhl
-    = ( op1_mux_sel_Dhl == 3'd0 ) ? rf_rdata1_Dhl
+    = ( rt_W_byp_Dhl )            ? wb_mux_out_Whl              // bypass
+    : ( rt_M_byp_Dhl )            ? dmemresp_queue_mux_out_Mhl
+    : ( rt_X_byp_Dhl )            ? execute_mux_out_Mhl
+    : ( op1_mux_sel_Dhl == 3'd0 ) ? rf_rdata1_Dhl
     : ( op1_mux_sel_Dhl == 3'd1 ) ? imm_zext_Dhl
     : ( op1_mux_sel_Dhl == 3'd2 ) ? imm_sext_Dhl
     : ( op1_mux_sel_Dhl == 3'd3 ) ? pc_plus4_Dhl
