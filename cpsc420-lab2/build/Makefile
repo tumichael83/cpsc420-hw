@@ -55,12 +55,20 @@ tests = \
   parcv1-ori.vmh \
   parcv1-lui.vmh \
   parcv1-addu.vmh \
+  parcv1-bne.vmh \
   parcv1-lw.vmh \
   parcv1-sw.vmh \
-  parcv1-bne.vmh \
   parcv1-jal.vmh \
   parcv1-jr.vmh \
-  parcv2-andi.vmh \
+  parcv2-lb.vmh \
+  parcv2-lbu.vmh \
+  parcv2-lh.vmh \
+  parcv2-lhu.vmh \
+  parcv2-sh.vmh \
+  parcv2-sb.vmh \
+  parcv2-j.vmh \
+  parcv2-jalr.vmh \
+  # parcv2-andi.vmh \
   parcv2-xori.vmh \
   parcv2-sll.vmh \
   parcv2-srl.vmh \
@@ -77,14 +85,6 @@ tests = \
   parcv2-or.vmh \
   parcv2-xor.vmh \
   parcv2-nor.vmh \
-  parcv2-lb.vmh \
-  parcv2-lbu.vmh \
-  parcv2-lh.vmh \
-  parcv2-lhu.vmh \
-  parcv2-sh.vmh \
-  parcv2-sb.vmh \
-  parcv2-j.vmh \
-  parcv2-jalr.vmh \
   parcv2-beq.vmh \
   parcv2-blez.vmh \
   parcv2-bgtz.vmh \

@@ -175,7 +175,7 @@ module parc_CoreDpath
   wire [31:0] jumpreg_targ_Dhl;
 
   assign jumpreg_targ_Dhl
-    = ( rs_X_byp_Dhl )            ? execute_mux_out_Xhl              // bypass
+    = ( rs_X_byp_Dhl )            ? execute_mux_out_Xhl // bypass
     : ( rs_M_byp_Dhl )            ? wb_mux_out_Mhl
     : ( rs_W_byp_Dhl )            ? wb_mux_out_Whl
     :                               rf_rdata0_Dhl;
@@ -197,10 +197,11 @@ module parc_CoreDpath
   // Operand 0 mux
 
   wire [31:0] op0_mux_out_Dhl
-    = ( rs_X_byp_Dhl )            ? execute_mux_out_Xhl              // bypass
-    : ( rs_M_byp_Dhl )            ? wb_mux_out_Mhl
-    : ( rs_W_byp_Dhl )            ? wb_mux_out_Whl
-    : ( op0_mux_sel_Dhl == 2'd0 ) ? rf_rdata0_Dhl
+    = ( op0_mux_sel_Dhl == 2'd0 ) ?
+          ( ( rs_X_byp_Dhl )            ? execute_mux_out_Xhl  // bypass
+          : ( rs_M_byp_Dhl )            ? wb_mux_out_Mhl
+          : ( rs_W_byp_Dhl )            ? wb_mux_out_Whl
+          :                               rf_rdata0_Dhl)
     : ( op0_mux_sel_Dhl == 2'd1 ) ? shamt_Dhl
     : ( op0_mux_sel_Dhl == 2'd2 ) ? const16
     : ( op0_mux_sel_Dhl == 2'd3 ) ? const0
@@ -209,10 +210,11 @@ module parc_CoreDpath
   // Operand 1 mux
 
   wire [31:0] op1_mux_out_Dhl
-    = ( rt_X_byp_Dhl )            ? execute_mux_out_Xhl              // bypass
-    : ( rt_M_byp_Dhl )            ? wb_mux_out_Mhl
-    : ( rt_W_byp_Dhl )            ? wb_mux_out_Whl
-    : ( op1_mux_sel_Dhl == 3'd0 ) ? rf_rdata1_Dhl
+    = ( op1_mux_sel_Dhl == 2'd0 ) ?
+          ( ( rt_X_byp_Dhl )            ? execute_mux_out_Xhl  // bypass
+          : ( rt_M_byp_Dhl )            ? wb_mux_out_Mhl
+          : ( rt_W_byp_Dhl )            ? wb_mux_out_Whl
+          :                               rf_rdata1_Dhl)
     : ( op1_mux_sel_Dhl == 3'd1 ) ? imm_zext_Dhl
     : ( op1_mux_sel_Dhl == 3'd2 ) ? imm_sext_Dhl
     : ( op1_mux_sel_Dhl == 3'd3 ) ? pc_plus4_Dhl
@@ -222,13 +224,10 @@ module parc_CoreDpath
   // wdata with bypassing
   // =============================
   // TODO: SOMETHING IS WRONG HERE (i think?)
-  // =============================
+  // ==========================================================
 
   wire [31:0] wdata_Dhl
-    = ( rt_X_byp_Dhl )            ? execute_mux_out_Xhl              // bypass
-    : ( rt_M_byp_Dhl )            ? wb_mux_out_Mhl
-    : ( rt_W_byp_Dhl )            ? wb_mux_out_Whl
-    :                               rf_rdata1_Dhl;
+    =                              rf_rdata1_Dhl;
 
   //----------------------------------------------------------------------
   // X <- D

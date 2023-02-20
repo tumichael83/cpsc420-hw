@@ -1,0 +1,27 @@
+WARNING: ../pv2byp/pv2byp-sim.v:154: $readmemh: Standard inconsistency, following 1364-2005.
+VCD info: dumpfile ../tests/build/vmh/parcv2-jalr.vcd opened for output.
+{ xxxxxxxx |        |        |        |        }
+{ xxxxxxxx |        |        |        |        }
+{ xxxxxxxx |        |        |        |        }
+{ 00080000 |  (-_-) |  (-_-) |  (-_-) |  (-_-) }
+{ 00080000 |  (-_-) |  (-_-) |  (-_-) |  (-_-) }
+{ 00080004 |  addiu |  (-_-) |  (-_-) |  (-_-) }
+{ 00080008 |  addiu |  addiu |  (-_-) |  (-_-) }
+{ 0008000c |  lui   |  addiu |  addiu |  (-_-) }
+{ 00080010 |  addiu |  lui   |  addiu |  addiu }
+{-00080014-|  jalr  |  addiu |  lui   |  addiu }
+{ 00080024 |  (-_-) |  jalr  |  addiu |  lui   }
+{ 00080028 |  lui   |  (-_-) |  jalr  |  addiu }
+{ 0008002c |  addiu |  lui   |  (-_-) |  jalr  }
+{ 00080030 |  addiu |  addiu |  lui   |  (-_-) }
+{ 00080034 |  bne   |  addiu |  addiu |  lui   }
+{-00080038-|- addiu-|  bne   |  addiu |  addiu }
+{ 00080110 |  (-_-) |  (-_-) |  bne   |  addiu }
+{ 00080114 |  addiu |  (-_-) |  (-_-) |  bne   }
+{ 00080118 |  mtc0  |  addiu |  (-_-) |  (-_-) }
+{ 0008011c |  bne   |  mtc0  |  addiu |  (-_-) }
+{-00080120-|- nop  -|  bne   |  mtc0  |  addiu }
+{ 00080118 |  (-_-) |  (-_-) |  bne   |  mtc0  }
+*** FAILED *** (status =         14)
+{ 0008011c |  bne   |  (-_-) |  (-_-) |  bne   }
+{-00080120-|

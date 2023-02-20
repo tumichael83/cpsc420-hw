@@ -86,6 +86,9 @@ module parc_Core
   wire         rt_X_byp_Dhl;
   wire         rt_M_byp_Dhl;
   wire         rt_W_byp_Dhl;
+  wire         wdata_X_byp_Dhl;
+  wire         wdata_M_byp_Dhl;
+  wire         wdata_W_byp_Dhl;
 
   //----------------------------------------------------------------------
   // Pack Memory Request Messages

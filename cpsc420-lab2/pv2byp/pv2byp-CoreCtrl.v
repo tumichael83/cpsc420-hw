@@ -402,6 +402,7 @@ module parc_CoreCtrl
       `PARC_INST_MSG_SB      :cs={ y,  n,    br_none, pm_p,   am_rdat, y, bm_si,   y, alu_add,  md_x,    n, mdm_x, em_x,   st,  ml_b, dmm_b,  wm_mem, n,  rx, n   };
 
       `PARC_INST_MSG_J       :cs={ y,  y,    br_none, pm_j,   am_x,    n, bm_x,    n, alu_x,    md_x,    n, mdm_x, em_x,   nr,  ml_x, dmm_x,  wm_x,   n,  rx, n   };
+
       `PARC_INST_MSG_JALR    :cs={ y,  y,    br_none, pm_r,   am_0,    y, bm_pc,   n, alu_add,  md_x,    n, mdm_x, em_alu, nr,  ml_x, dmm_x,  wm_alu, y,  rd, n   };
 
       `PARC_INST_MSG_BEQ     :cs={ y,  n,    br_beq,  pm_b,   am_rdat, y, bm_rdat, y, alu_sub,  md_x,    n, mdm_x, em_x,   nr,  ml_x, dmm_x,  wm_x,   n,  rx, n   };
@@ -503,7 +504,6 @@ module parc_CoreCtrl
 
   // Stall for data hazards if either of the operand read addresses are
   // the same as the write addresses of instruction later in the pipeline
-
 
   // change stall to load only! <-- temporarily disabled
   wire stall_hazard_Dhl   = inst_val_Dhl && (
@@ -812,7 +812,7 @@ module parc_CoreCtrl
 
   assign rf_wen_out_Whl = ( inst_val_Whl && !stall_Whl && rf_wen_Whl );
 
-  // Dummy squahs and stall signals
+  // Dummy squash and stall signals
 
   wire squash_Whl = 1'b0;
   wire stall_Whl  = 1'b0;
