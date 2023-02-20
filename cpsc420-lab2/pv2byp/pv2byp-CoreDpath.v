@@ -170,11 +170,15 @@ module parc_CoreDpath
   wire [ 4:0] rf_raddr1_Dhl = inst_rt_Dhl;
   wire [31:0] rf_rdata1_Dhl;
 
-  // Jump reg address
+  // Jump reg address <-- also need bypassing here !!!!!!!!!!!!!
 
   wire [31:0] jumpreg_targ_Dhl;
 
-  assign jumpreg_targ_Dhl  = rf_rdata0_Dhl;
+  assign jumpreg_targ_Dhl
+    = ( rs_X_byp_Dhl )            ? execute_mux_out_Xhl              // bypass
+    : ( rs_M_byp_Dhl )            ? wb_mux_out_Mhl
+    : ( rs_W_byp_Dhl )            ? wb_mux_out_Whl
+    :                               rf_rdata0_Dhl;
 
   // Zero and sign extension immediate
 
