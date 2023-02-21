@@ -194,27 +194,31 @@ module parc_CoreDpath
   wire [31:0] const0    = 32'd0;
   wire [31:0] const16   = 32'd16;
 
-  // Operand 0 mux
+  // Operand 0 mux and bypass
+
+  wire [31:0] op0_byp_mux
+    = ( rs_X_byp_Dhl )            ? execute_mux_out_Xhl  // bypass
+    : ( rs_M_byp_Dhl )            ? wb_mux_out_Mhl
+    : ( rs_W_byp_Dhl )            ? wb_mux_out_Whl
+    :                               rf_rdata0_Dhl;
 
   wire [31:0] op0_mux_out_Dhl
-    = ( op0_mux_sel_Dhl == 2'd0 ) ?
-          ( ( rs_X_byp_Dhl )            ? execute_mux_out_Xhl  // bypass
-          : ( rs_M_byp_Dhl )            ? wb_mux_out_Mhl
-          : ( rs_W_byp_Dhl )            ? wb_mux_out_Whl
-          :                               rf_rdata0_Dhl)
+    = ( op0_mux_sel_Dhl == 2'd0 ) ? op0_byp_mux    // if reg val
     : ( op0_mux_sel_Dhl == 2'd1 ) ? shamt_Dhl
     : ( op0_mux_sel_Dhl == 2'd2 ) ? const16
     : ( op0_mux_sel_Dhl == 2'd3 ) ? const0
     :                               32'bx;
 
-  // Operand 1 mux
+  // Operand 1 mux and bypass
+
+  wire [31:0] op1_byp_mux
+    = ( rt_X_byp_Dhl )            ? execute_mux_out_Xhl  // bypass
+    : ( rt_M_byp_Dhl )            ? wb_mux_out_Mhl
+    : ( rt_W_byp_Dhl )            ? wb_mux_out_Whl
+    :                               rf_rdata1_Dhl;
 
   wire [31:0] op1_mux_out_Dhl
-    = ( op1_mux_sel_Dhl == 2'd0 ) ?
-          ( ( rt_X_byp_Dhl )            ? execute_mux_out_Xhl  // bypass
-          : ( rt_M_byp_Dhl )            ? wb_mux_out_Mhl
-          : ( rt_W_byp_Dhl )            ? wb_mux_out_Whl
-          :                               rf_rdata1_Dhl)
+    = ( op1_mux_sel_Dhl == 2'd0 ) ? op1_byp_mux
     : ( op1_mux_sel_Dhl == 3'd1 ) ? imm_zext_Dhl
     : ( op1_mux_sel_Dhl == 3'd2 ) ? imm_sext_Dhl
     : ( op1_mux_sel_Dhl == 3'd3 ) ? pc_plus4_Dhl
@@ -227,7 +231,7 @@ module parc_CoreDpath
   // ==========================================================
 
   wire [31:0] wdata_Dhl
-    =                              rf_rdata1_Dhl;
+    =                              op1_byp_mux;
 
   //----------------------------------------------------------------------
   // X <- D

@@ -505,32 +505,22 @@ module parc_CoreCtrl
   // Stall for data hazards if either of the operand read addresses are
   // the same as the write addresses of instruction later in the pipeline
 
-  // change stall to load only! <-- temporarily disabled
-  wire stall_hazard_Dhl   = inst_val_Dhl && (
-                            ( rs_en_Dhl && inst_val_Xhl && rf_wen_Xhl
-                              && ( rs_addr_Dhl == rf_waddr_Xhl )
-                              && ( rf_waddr_Xhl != 5'd0 ) )
-                         || ( rs_en_Dhl && inst_val_Mhl && rf_wen_Mhl
-                              && ( rs_addr_Dhl == rf_waddr_Mhl )
-                              && ( rf_waddr_Mhl != 5'd0 ) )
-                         || ( rs_en_Dhl && inst_val_Whl && rf_wen_Whl
-                              && ( rs_addr_Dhl == rf_waddr_Whl )
-                              && ( rf_waddr_Whl != 5'd0 ) )
-                         || ( rt_en_Dhl && inst_val_Xhl && rf_wen_Xhl
-                              && ( rt_addr_Dhl == rf_waddr_Xhl )
-                              && ( rf_waddr_Xhl != 5'd0 ) )
-                         || ( rt_en_Dhl && inst_val_Mhl && rf_wen_Mhl
-                              && ( rt_addr_Dhl == rf_waddr_Mhl )
-                              && ( rf_waddr_Mhl != 5'd0 ) )
-                         || ( rt_en_Dhl && inst_val_Whl && rf_wen_Whl
-                              && ( rt_addr_Dhl == rf_waddr_Whl )
-                              && ( rf_waddr_Whl != 5'd0 ) ) );
+  wire is_load_Dhl = ( cs[`PARC_INST_MSG_MEM_REQ] == ld );
+  wire is_store_Dhl = ( cs[`PARC_INST_MSG_MEM_REQ] == st );
+
+  // stall if we have a load use dependency (wait for data to reach reg)
+  wire stall_load_use_Dhl =  (rs_X_byp_Dhl && is_load_Xhl)
+                          || (rs_M_byp_Dhl && is_load_Mhl)
+                          || (rt_X_byp_Dhl && is_load_Xhl)
+                          || (rt_M_byp_Dhl && is_load_Mhl);
+
+  // stall for write to memory followed by immediate read (wait for data to reach mem)
 
   // Aggregate Stall Signal
 
   assign stall_Dhl = ( stall_Xhl
-                  ||   stall_muldiv_Dhl );
-                  //||   stall_hazard_Dhl );
+                  ||   stall_muldiv_Dhl 
+                  ||   stall_load_use_Dhl );
 
 
   // Bypass Signals
@@ -596,6 +586,8 @@ module parc_CoreCtrl
 
   reg        bubble_Xhl;
 
+  reg        is_load_Xhl;
+
   // Pipeline Controls
 
   always @ ( posedge clk ) begin
@@ -621,6 +613,8 @@ module parc_CoreCtrl
       cp0_addr_Xhl         <= cp0_addr_Dhl;
 
       bubble_Xhl           <= bubble_next_Dhl;
+
+      is_load_Xhl          <= is_load_Dhl;
     end
 
   end
@@ -715,6 +709,8 @@ module parc_CoreCtrl
 
   reg        bubble_Mhl;
 
+  reg        is_load_Mhl;
+
   // Pipeline Controls
 
   always @ ( posedge clk ) begin
@@ -731,6 +727,8 @@ module parc_CoreCtrl
       cp0_addr_Mhl         <= cp0_addr_Xhl;
 
       bubble_Mhl           <= bubble_next_Xhl;
+
+      is_load_Mhl          <= is_load_Xhl;
     end
     dmemreq_val_Mhl <= dmemreq_val;
   end
