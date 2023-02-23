@@ -68,7 +68,7 @@ tests = \
   parcv2-sb.vmh \
   parcv2-j.vmh \
   parcv2-jalr.vmh \
-  # parcv2-andi.vmh \
+  parcv2-andi.vmh \
   parcv2-xori.vmh \
   parcv2-sll.vmh \
   parcv2-srl.vmh \

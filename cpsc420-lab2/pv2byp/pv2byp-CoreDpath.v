@@ -227,11 +227,8 @@ module parc_CoreDpath
 
   // wdata with bypassing
   // =============================
-  // TODO: SOMETHING IS WRONG HERE (i think?)
-  // ==========================================================
 
-  wire [31:0] wdata_Dhl
-    =                              op1_byp_mux;
+  wire [31:0] wdata_Dhl = op1_byp_mux;
 
   //----------------------------------------------------------------------
   // X <- D
