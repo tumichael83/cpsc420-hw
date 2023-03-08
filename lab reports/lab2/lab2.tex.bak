@@ -1,0 +1,135 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage{amsmath}
+\usepackage{amsfonts, amsthm, amssymb} % this has the proof environment
+\usepackage[top=1in, bottom=1in, left=.8in, right=.8in]{geometry} % good margins
+
+% images 
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+
+%verilog code
+\usepackage{xcolor}
+\usepackage{listings}
+\definecolor{vgreen}{RGB}{104,180,104}
+\definecolor{vblue}{RGB}{49,49,255}
+\definecolor{vorange}{RGB}{255,143,102}
+
+\lstdefinestyle{verilog-style}
+{
+    language=Verilog,
+    basicstyle=\small\ttfamily,
+    keywordstyle=\color{vblue},
+    identifierstyle=\color{black},
+    commentstyle=\color{vgreen},
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    numbersep=10pt,
+    tabsize=8,
+    moredelim=*[s][\colorIndex]{[}{]},
+    literate=*{:}{:}1
+}
+
+\makeatletter
+\newcommand*\@lbracket{[}
+\newcommand*\@rbracket{]}
+\newcommand*\@colon{:}
+\newcommand*\colorIndex{%
+    \edef\@temp{\the\lst@token}%
+    \ifx\@temp\@lbracket \color{black}%
+    \else\ifx\@temp\@rbracket \color{black}%
+    \else\ifx\@temp\@colon \color{black}%
+    \else \color{vorange}%
+    \fi\fi\fi
+}
+\makeatother
+
+\usepackage{trace}
+
+\newcommand{\paren}[1]{\left(#1\right )}
+\newcommand{\set}[1]{\left \{#1\right \}}
+\newcommand{\R}[0]{\mathbb R}
+\newcommand{\Z}[0]{\mathbb Z}
+\newcommand{\de}[0]{\text{\normalfont d}}
+\newcommand{\mycomment}[1]{}
+
+
+\begin{document}
+
+\title{\vspace*{-.9in}Lab 2: Pipelined Muldiv Unit}
+\date{Due: 2/22/2023}
+\author{Michael Tu}
+\maketitle
+\hrule
+
+\section{Abstract}
+The purpose of this lab was to implement a pipelined, bypass enabled processor that can execute the PARC2 subset of x86-instructions. This provides enough functionally to run basic C code which does not require systemcalls. In particular, the processor also includes a pipelined multiplication/division unit to increase performance.
+
+\section{Design Considerations:}
+\textbf{Section 1:} For section 1, the main design change I needed was to add additional wires to capture additional branch conditions besides \texttt{bne}.
+\\ \\
+\textbf{Section 2:} For section 2, I modified my control unit to send bypass signals (\texttt{r[x]\_byp\_[X]hl}) to my datapath. The only cases in which one would need bypass values is when reading from the register file. Therefore, I added a mux input that combined the register files and bypass values. Finally, I added stalling for load-use dependencies, where a instruction must stall if it depends on a load.
+\\ \\
+\textbf{Section 3:} For section 3, I added two additional stages into the pipeline. Additionally, I needed to pass the \texttt{val} and \texttt{rdy} through the control units. The first additional stage ``Execute 2" does not perform any computation. Instead, it is only used to stall until the pipelined MulDiv unit completes. The second additional stage, ``Execute 3" is used to receive the output of the pipelined muldiv unit and pass it to the writeback stage.
+
+\section{Testing}
+In order to test, I tried repeatedly loading and reading from the same memory location. 
+
+\section{Evaluation}
+The benchmark results are below
+
+\begin{center}
+\begin{tabular}{ |p{3cm}|p{3cm}|p{3cm}|p{4.5cm}|  }
+ \hline
+ \multicolumn{4}{|c|}{pv2Stall Results} \\
+ \hline
+ Benchmark & Cycles & Instructions & IPC  \\
+ \hline
+ vvadd & 478 & 455 & 0.951883 \\
+ cmplx-mult & 16718 & 1864 & 0.111497 \\
+ masked-filter & 16174 & 4499 & 0.278162 \\
+ bin-search & 3382 & 1279 & 0.378179 \\
+ \hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{ |p{3cm}|p{3cm}|p{3cm}|p{4.5cm}|  }
+ \hline
+ \multicolumn{4}{|c|}{pv2Byp Results} \\
+ \hline
+ Benchmark & Cycles & Instructions & IPC  \\
+ \hline
+ vvadd & 473 & 455 & 0.961945 \\
+ cmplx-mult & 15312 & 1864 & 0.121735 \\
+ masked-filter & 13832 & 4499 & 0.325260 \\
+ bin-search & 1749 & 1279 & 0.731275 \\
+ \hline
+\end{tabular}
+\end{center}
+
+
+\begin{center}
+\begin{tabular}{ |p{3cm}|p{3cm}|p{3cm}|p{4.5cm}|  }
+ \hline
+ \multicolumn{4}{|c|}{pv2long Results} \\
+ \hline
+ Benchmark & Cycles & Instructions & IPC  \\
+ \hline
+ vvadd & 473 & 455 & 0.961945 \\
+ cmplx-mult & 2662 & 1864 & 0.700225 \\
+ masked-filter & 6058 & 4499 & 0.325260 \\
+ bin-search & 1749 & 1279 & 0.731275 \\
+ \hline
+\end{tabular}
+\end{center}
+\section{Discussion}
+From the benchmarks provided, we can see that bypassing provides a significant performance improvement over stalling, up to an almost 2$\times$ improvement. However, we see that even greater performance improvements can come by preventing the pipeline from stalling for long multiplications. This leads to a nearly order of magnitude improvement, especially for the complex multiplication test which involves many multiplications.
+
+\section{Figures}
+This is the datapath for part 2, the important difference is the addition of two muxes which allow for bypass values into the op0 and op1 muxes.
+
+
+This is the datapath for part 2, the important difference is the addition of two muxes which allow for bypass values into the op0 and op1 muxes.
+
+
+\end{document}
