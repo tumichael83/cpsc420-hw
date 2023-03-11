@@ -223,6 +223,8 @@ module parc_CoreCtrl
   reg [31:0] ir1_Dhl;
   reg        bubble_Dhl;
 
+  // need to add / use stall_0_dhl
+  // need to add / use stall_1_dhl
   wire squash_first_D_inst =
     (inst_val_Dhl && !stall_0_Dhl && stall_1_Dhl);
 
@@ -950,6 +952,7 @@ module parc_CoreCtrl
   //           should add irA_X0hl --> added
   reg [31:0] ir0_X0hl;
   reg [31:0] irA_X0hl;
+  reg [31:0] irB_X0hl;
 
   reg  [2:0] br_sel_X0hl;
   reg  [3:0] alu0_fn_X0hl;
@@ -983,6 +986,7 @@ module parc_CoreCtrl
     else if( !stall_X0hl ) begin
       ir0_X0hl              <= ir0_Dhl;
       irA_X0hl              <= irA_Dhl;
+      irB_X0hl              <= irB_Dhl;
       br_sel_X0hl           <= br_sel_Dhl;
       alu0_fn_X0hl          <= alu0_fn_Dhl;
       muldivreq_val_X0hl    <= muldivreq_val_Dhl;
@@ -1088,6 +1092,7 @@ module parc_CoreCtrl
   //           should add irA_X1hl --> added
   reg [31:0] ir0_X1hl;
   reg [31:0] irA_X1hl;
+  reg [31:0] irB_X1hl;
 
 
   reg        is_load_X1hl;
@@ -1119,6 +1124,7 @@ module parc_CoreCtrl
     else if( !stall_X1hl ) begin
       ir0_X1hl              <= ir0_X0hl;
       irA_X1hl              <= irA_X0hl;
+      irB_X1hl              <= irB_X0hl;
       is_load_X1hl          <= is_load_X0hl;
       is_muldiv_X1hl        <= is_muldiv_X0hl;
       dmemreq_val_X1hl      <= dmemreq_val;
@@ -1179,6 +1185,7 @@ module parc_CoreCtrl
   //           should add irA_X2hl --> added
   reg [31:0] ir0_X2hl;
   reg [31:0] irA_X2hl;
+  reg [31:0] irB_X2hl;
 
 
   reg        is_muldiv_X2hl;
@@ -1205,6 +1212,7 @@ module parc_CoreCtrl
     else if( !stall_X2hl ) begin
       ir0_X2hl              <= ir0_X1hl;
       irA_X2hl              <= irA_X1hl;
+      irB_X2hl              <= irB_X1hl;
       is_muldiv_X2hl        <= is_muldiv_X1hl;
       muldiv_mux_sel_X2hl   <= muldiv_mux_sel_X1hl;
       rf0_wen_X2hl          <= rf0_wen_X1hl;
@@ -1248,7 +1256,7 @@ module parc_CoreCtrl
   //           should add irA_X3hl -- added
   reg [31:0] ir0_X3hl;
   reg [31:0] irA_X3hl;
-
+  reg [31:0] irB_X3hl;
 
   reg        is_muldiv_X3hl;
 
@@ -1273,6 +1281,7 @@ module parc_CoreCtrl
     else if( !stall_X3hl ) begin
       ir0_X3hl              <= ir0_X2hl;
       irA_X3hl              <= irA_X2hl;
+      irB_X3hl              <= irB_X2hl;
       is_muldiv_X3hl        <= is_muldiv_X2hl;
       muldiv_mux_sel_X3hl   <= muldiv_mux_sel_X2hl;
       rf0_wen_X3hl          <= rf0_wen_X2hl;
@@ -1315,6 +1324,7 @@ module parc_CoreCtrl
   //           should add irA_Whl --> added
   reg [31:0] ir0_Whl;
   reg [31:0] irA_Whl;
+  reg [31:0] irB_Whl;
 
   //           should add rfA_wen_Whl
   reg        rf0_wen_Whl;
@@ -1335,6 +1345,7 @@ module parc_CoreCtrl
     else if( !stall_Whl ) begin
       ir0_Whl          <= ir0_X3hl;
       irA_Whl          <= irA_X3hl;
+      irB_Whl          <= irB_X3hl;
       rf0_wen_Whl      <= rf0_wen_X3hl;
       rf0_waddr_Whl    <= rf0_waddr_X3hl;
       cp0_wen_Whl      <= cp0_wen_X3hl;
