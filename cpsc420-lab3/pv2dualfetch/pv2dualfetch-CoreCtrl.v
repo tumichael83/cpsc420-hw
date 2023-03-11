@@ -221,8 +221,7 @@ module parc_CoreCtrl
   reg [31:0] ir1_Dhl;
   reg        bubble_Dhl;
 
-  // need to add / use stall_0_dhl
-  // need to add / use stall_1_dhl
+  // unsure what this is for!!!
   wire squash_first_D_inst =
     (inst_val_Dhl && !stall_0_Dhl && stall_1_Dhl);
 
@@ -584,9 +583,24 @@ module parc_CoreCtrl
   reg [31:0] irA_Dhl;
   reg [31:0] irB_Dhl;
 
-  // need to add logic for this, switch per execution 
-  reg steering_mux_sel; 
-
+  // need to add logic for this, switch per execution  --> added some???
+  reg steering_mux_sel;
+   
+  always @ ( posedge clk ) begin
+    if ( reset ) begin
+      steering_mux_sel <= 1'b0;
+    end
+    else if( !stall_Dhl ) begin
+      if ( steering_mux_sel == 1'b0 )
+      begin
+        steering_mux_sel <= 1'b1;
+      end
+      else if (steering_mux_sel == 1'b1)
+      begin
+        steering_mux_sel <= 1'b0;
+      end
+    end
+  end
 
   always @(*)
   begin
