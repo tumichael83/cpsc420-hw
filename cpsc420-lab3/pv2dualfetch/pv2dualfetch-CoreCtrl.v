@@ -876,6 +876,7 @@ module parc_CoreCtrl
                            || ( inst_val_X3hl && rt0_en_Dhl && rfA_wen_X3hl
                                 && ( rt0_addr_Dhl == rfA_waddr_X3hl )
                                 && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl ));
+
   wire stall_1_muldiv_use_Dhl = inst_val_Dhl && (
                               ( inst_val_X0hl && rs1_en_Dhl && rfA_wen_X0hl
                                 && ( rs1_addr_Dhl == rfA_waddr_X0hl )
@@ -934,13 +935,18 @@ module parc_CoreCtrl
                               && ( rt1_addr_Dhl == rfA_waddr_X1hl )
                               && ( rfA_waddr_X1hl != 5'd0 ) && is_load_X1hl ) );
 
-  // Aggregate Stall Signal
+  // Aggregate Stall Signals
 
-  wire stall_Dhl = (stall_X0hl || stall_0_muldiv_use_Dhl || stall_0_load_use_Dhl);
+  // changed stall_Dhl to stall for both
+  // also added stall_0_ and stall_1_ ??
+  wire stall_0_Dhl = (stall_X0hl || stall_0_muldiv_use_Dhl || stall_0_load_use_Dhl);
+  wire stall_1_Dhl = (stall_X0hl || stall_1_muldiv_use_Dhl || stall_1_load_use_Dhl);
+
+  wire stall_Dhl = stall_0_Dhl || stall_1_Dhl;
 
   // Next bubble bit
 
-  wire bubble_sel_Dhl  = ( squash_Dhl || stall_0_Dhl );
+  wire bubble_sel_Dhl  = ( squash_Dhl || stall_Dhl ); // changed this to stall_Dhl from stall_0_Dhl
   wire bubble_next_Dhl = ( !bubble_sel_Dhl ) ? bubble_Dhl
                        : ( bubble_sel_Dhl )  ? 1'b1
                        :                       1'bx;
