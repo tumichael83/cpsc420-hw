@@ -87,9 +87,7 @@ module parc_CoreCtrl
   output  [3:0] op00_byp_mux_sel_Dhl,
   output  [3:0] op01_byp_mux_sel_Dhl,
   output  [3:0] op10_byp_mux_sel_Dhl,
-  output  [3:0] op11_byp_mux_sel_Dhl,
-
-  output        rf0_wen_out_Whl
+  output  [3:0] op11_byp_mux_sel_Dhl
 );
 
   //----------------------------------------------------------------------
@@ -586,7 +584,9 @@ module parc_CoreCtrl
   reg [31:0] irA_Dhl;
   reg [31:0] irB_Dhl;
 
-  reg steering_mux_sel; // need to add logic for this, switch per execution 
+  // need to add logic for this, switch per execution 
+  reg steering_mux_sel; 
+
 
   always @(*)
   begin
@@ -828,8 +828,8 @@ module parc_CoreCtrl
 
   // Register Writeback Controls
 
-  wire rf0_wen_Dhl         = csA[`PARC_INST_MSG_RF_WEN];
-  wire [4:0] rf0_waddr_Dhl = csA[`PARC_INST_MSG_RF_WADDR];
+  wire rfA_wen_Dhl         = csA[`PARC_INST_MSG_RF_WEN];
+  wire [4:0] rfA_waddr_Dhl = csA[`PARC_INST_MSG_RF_WADDR];
 
   // Coprocessor write enable
 
@@ -968,9 +968,9 @@ module parc_CoreCtrl
   reg  [2:0] dmemresp_mux_sel_X0hl;
   reg        memex_mux_sel_X0hl;
   
-  //         should add rf_A_wen_X0hl
-  reg        rf0_wen_X0hl;
-  reg  [4:0] rf0_waddr_X0hl;
+  //         should add rf_A_wen_X0hl --> added
+  reg        rfA_wen_X0hl;
+  reg  [4:0] rfA_waddr_X0hl;
 
   reg        cp0_wen_X0hl;
   reg  [4:0] cp0_addr_X0hl;
@@ -1000,8 +1000,8 @@ module parc_CoreCtrl
       dmemreq_val_X0hl      <= dmemreq_val_Dhl;
       dmemresp_mux_sel_X0hl <= dmemresp_mux_sel_Dhl;
       memex_mux_sel_X0hl    <= memex_mux_sel_Dhl;
-      rf0_wen_X0hl          <= rf0_wen_Dhl;
-      rf0_waddr_X0hl        <= rf0_waddr_Dhl;
+      rfA_wen_X0hl          <= rfA_wen_Dhl;
+      rfA_waddr_X0hl        <= rfA_waddr_Dhl;
       cp0_wen_X0hl          <= cp0_wen_Dhl;
       cp0_addr_X0hl         <= cp0_addr_Dhl;
 
@@ -1103,9 +1103,9 @@ module parc_CoreCtrl
   reg        execute_mux_sel_X1hl;
   reg        muldiv_mux_sel_X1hl;
 
-  //         should add rfA_wen_X1hl
-  reg        rf0_wen_X1hl;
-  reg  [4:0] rf0_waddr_X1hl;
+  //         should add rfA_wen_X1hl --> added
+  reg        rfA_wen_X1hl;
+  reg  [4:0] rfA_waddr_X1hl;
 
 
   reg        cp0_wen_X1hl;
@@ -1132,8 +1132,8 @@ module parc_CoreCtrl
       memex_mux_sel_X1hl    <= memex_mux_sel_X0hl;
       execute_mux_sel_X1hl  <= execute_mux_sel_X0hl;
       muldiv_mux_sel_X1hl   <= muldiv_mux_sel_X0hl;
-      rf0_wen_X1hl          <= rf0_wen_X0hl;
-      rf0_waddr_X1hl        <= rf0_waddr_X0hl;
+      rfA_wen_X1hl          <= rfA_wen_X0hl;
+      rfA_waddr_X1hl        <= rfA_waddr_X0hl;
       cp0_wen_X1hl          <= cp0_wen_X0hl;
       cp0_addr_X1hl         <= cp0_addr_X0hl;
 
@@ -1191,9 +1191,9 @@ module parc_CoreCtrl
   reg        is_muldiv_X2hl;
   reg        dmemresp_queue_val_X1hl;
 
-  //           should add rfA_wen_X2hl
-  reg        rf0_wen_X2hl;
-  reg  [4:0] rf0_waddr_X2hl;
+  //           should add rfA_wen_X2hl --> added
+  reg        rfA_wen_X2hl;
+  reg  [4:0] rfA_waddr_X2hl;
 
 
   reg        cp0_wen_X2hl;
@@ -1215,8 +1215,8 @@ module parc_CoreCtrl
       irB_X2hl              <= irB_X1hl;
       is_muldiv_X2hl        <= is_muldiv_X1hl;
       muldiv_mux_sel_X2hl   <= muldiv_mux_sel_X1hl;
-      rf0_wen_X2hl          <= rf0_wen_X1hl;
-      rf0_waddr_X2hl        <= rf0_waddr_X1hl;
+      rfA_wen_X2hl          <= rfA_wen_X1hl;
+      rfA_waddr_X2hl        <= rfA_waddr_X1hl;
       cp0_wen_X2hl          <= cp0_wen_X1hl;
       cp0_addr_X2hl         <= cp0_addr_X1hl;
       execute_mux_sel_X2hl  <= execute_mux_sel_X1hl;
@@ -1260,9 +1260,9 @@ module parc_CoreCtrl
 
   reg        is_muldiv_X3hl;
 
-  //           should add rfA_wen_X3hl
-  reg        rf0_wen_X3hl;
-  reg  [4:0] rf0_waddr_X3hl;
+  //           should add rfA_wen_X3hl --> added 
+  reg        rfA_wen_X3hl;
+  reg  [4:0] rfA_waddr_X3hl;
 
 
   reg        cp0_wen_X3hl;
@@ -1284,8 +1284,8 @@ module parc_CoreCtrl
       irB_X3hl              <= irB_X2hl;
       is_muldiv_X3hl        <= is_muldiv_X2hl;
       muldiv_mux_sel_X3hl   <= muldiv_mux_sel_X2hl;
-      rf0_wen_X3hl          <= rf0_wen_X2hl;
-      rf0_waddr_X3hl        <= rf0_waddr_X2hl;
+      rfA_wen_X3hl          <= rfA_wen_X2hl;
+      rfA_waddr_X3hl        <= rfA_waddr_X2hl;
       cp0_wen_X3hl          <= cp0_wen_X2hl;
       cp0_addr_X3hl         <= cp0_addr_X2hl;
       execute_mux_sel_X3hl  <= execute_mux_sel_X2hl;
@@ -1326,9 +1326,9 @@ module parc_CoreCtrl
   reg [31:0] irA_Whl;
   reg [31:0] irB_Whl;
 
-  //           should add rfA_wen_Whl
-  reg        rf0_wen_Whl;
-  reg  [4:0] rf0_waddr_Whl;
+  //           should add rfA_wen_Whl --> added
+  reg        rfA_wen_Whl;
+  reg  [4:0] rfA_waddr_Whl;
 
 
   reg        cp0_wen_Whl;
@@ -1346,8 +1346,8 @@ module parc_CoreCtrl
       ir0_Whl          <= ir0_X3hl;
       irA_Whl          <= irA_X3hl;
       irB_Whl          <= irB_X3hl;
-      rf0_wen_Whl      <= rf0_wen_X3hl;
-      rf0_waddr_Whl    <= rf0_waddr_X3hl;
+      rfA_wen_Whl      <= rfA_wen_X3hl;
+      rfA_waddr_Whl    <= rfA_waddr_X3hl;
       cp0_wen_Whl      <= cp0_wen_X3hl;
       cp0_addr_Whl     <= cp0_addr_X3hl;
 
@@ -1365,8 +1365,7 @@ module parc_CoreCtrl
 
   // Only set register file wen if stage is valid
 
-  //          should probably be rfA_wen_Whl everywhere
-  assign rf0_wen_out_Whl = ( inst_val_Whl && !stall_Whl && rf0_wen_Whl );
+  assign rfA_wen_out_Whl = ( inst_val_Whl && !stall_Whl && rfA_wen_Whl );
 
   // Dummy squash and stall signals
 
