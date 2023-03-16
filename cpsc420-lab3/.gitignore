@@ -1,1 +1,5 @@
 test_outputs/
+<<<<<<< HEAD
+=======
+build/*.out
+>>>>>>> attempt2
