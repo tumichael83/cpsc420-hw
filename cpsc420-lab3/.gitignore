@@ -1,9 +1,3 @@
 test_outputs/
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 build/*.out
->>>>>>> attempt2
-=======
-build/*.out
->>>>>>> attempt2
+tests/build/vmh/*.vcd
