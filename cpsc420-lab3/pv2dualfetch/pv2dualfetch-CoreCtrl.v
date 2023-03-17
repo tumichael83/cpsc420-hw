@@ -87,13 +87,7 @@ module parc_CoreCtrl
 
   // CP0 Status
 
-  output [31:0] cp0_status,
-
-  // my control signals (ctrl->input)
-  output  [3:0] op00_byp_mux_sel_Dhl,
-  output  [3:0] op01_byp_mux_sel_Dhl,
-  output  [3:0] op10_byp_mux_sel_Dhl,
-  output  [3:0] op11_byp_mux_sel_Dhl
+  output [31:0] cp0_status
 );
 
   //----------------------------------------------------------------------
@@ -603,7 +597,7 @@ module parc_CoreCtrl
     end
     else begin
       // idk how these conditions work
-      if (   (steering_mux_sel == 1'b0 && stall_0_Dhl || stall_1_Dhl) 
+      if (   (steering_mux_sel == 1'b0 && stall_0_Dhl) 
           || (steering_mux_sel == 1'b1 && (stall_1_Dhl || brj_taken_X0hl || brj_taken_Dhl)) ) begin
         steering_mux_sel <= steering_mux_sel;
       end
@@ -845,6 +839,7 @@ module parc_CoreCtrl
   // ALU Function --> assigned aluA_fn in addition to alu0_fn
 
     wire [3:0] alu0_fn_Dhl = cs0[`PARC_INST_MSG_ALU_FN];
+
     wire [3:0] aluA_fn_Dhl = csA[`PARC_INST_MSG_ALU_FN];
 
   // Muldiv Function --> changed from cs0 to csA because only aluA has muldiv
