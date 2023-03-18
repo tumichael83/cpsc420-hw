@@ -39,17 +39,17 @@ module parc_CoreCtrl
 
   // everything in this block is on me
   output  [3:0] opA0_byp_mux_sel_Dhl,   // +done
+  output  [2:0] opA1_mux_sel_Dhl,       // +done
   output  [1:0] opA0_mux_sel_Dhl,       // +done
   output  [3:0] opA1_byp_mux_sel_Dhl,   // +done
-  output  [2:0] opA1_mux_sel_Dhl,       // +done
-  output  [3:0] opB0_byp_mux_sel_Dhl,
-  output  [1:0] opB0_mux_sel_Dhl,
+  output  [3:0] opB0_byp_mux_sel_Dhl,   
+  output  [1:0] opB0_mux_sel_Dhl,       // +added
   output  [3:0] opB1_byp_mux_sel_Dhl,
-  output  [2:0] opB1_mux_sel_Dhl,
+  output  [2:0] opB1_mux_sel_Dhl,       // +added
   output [31:0] instA_Dhl,              // +done ( i think )
   output [31:0] instB_Dhl,              // +done ( i think )
   output  [3:0] aluA_fn_X0hl,           // seems to work?
-  output  [3:0] aluB_fn_X0hl,
+  output  [3:0] aluB_fn_X0hl,           // +added
   output  [2:0] muldivreq_msg_fn_Dhl,   // +done
   output        muldivreq_val,          // +done
 
@@ -67,8 +67,8 @@ module parc_CoreCtrl
   // everything in this block is on me
   output        rfA_wen_out_Whl,          // +done  
   output  [4:0] rfA_waddr_Whl,            // +done
-  output        rfB_wen_out_Whl,
-  output  [4:0] rfB_waddr_Whl,
+  output        rfB_wen_out_Whl,          // +added
+  output  [4:0] rfB_waddr_Whl,            // +added
 
   output        stall_Fhl,
   output        stall_Dhl,
@@ -170,7 +170,7 @@ module parc_CoreCtrl
 
   wire bubble_sel_Fhl  = ( squash_Fhl || stall_Fhl );
   wire bubble_next_Fhl = ( !bubble_sel_Fhl ) ? bubble_Fhl
-                       : ( bubble_sel_Fhl )  ? 1'b1
+                       : (  bubble_sel_Fhl ) ? 1'b1
                        :                       1'bx;
 
   //----------------------------------------------------------------------
@@ -580,12 +580,14 @@ module parc_CoreCtrl
 
   // Steering Logic
   /*
-    behavior:
-      switch from 0 to 1 every clock cycle unless
-        was in stage 0, and stage 0 was stalling
-        was in stage 1, and stage 1 was stalling
+    Overview:
 
-      steering stall: if currently in stage 0 and last stage was stage 1
+    | inst 0 type | inst 1 type | inst 0 dest | inst 1 dest |
+    =========================================================
+    |     ALU     |     ALU     |      B      |      A      |
+    |   n-ALU     |     ALU     |      A      |      B      |
+    |     ALU     |   n-ALU     |      B      |      A      |
+    |   n-ALU     |   n-ALU     |      A      |stall, then A|
   */
 
   reg steering_mux_sel;
@@ -825,7 +827,7 @@ module parc_CoreCtrl
       = ( steering_mux_sel == 0 ) ? op01_byp_mux_sel_Dhl
       :                             op11_byp_mux_sel_Dhl;
 
-  // Operand Mux Select --> added opA0 / opA1 in addition to op00/01/10/11
+  // Operand Mux Select --> added opA0 / opA1 in addition to op00/01/10/11 --> added opB0 / opB1
 
     wire [1:0] op00_mux_sel_Dhl = cs0[`PARC_INST_MSG_OP0_SEL];
     wire [2:0] op01_mux_sel_Dhl = cs0[`PARC_INST_MSG_OP1_SEL];
@@ -835,12 +837,15 @@ module parc_CoreCtrl
 
     assign opA0_mux_sel_Dhl = csA[`PARC_INST_MSG_OP0_SEL];
     assign opA1_mux_sel_Dhl = csA[`PARC_INST_MSG_OP1_SEL];
+    assign opB0_mux_sel_Dhl = csB[`PARC_INST_MSG_OP0_SEL];
+    assign opB1_mux_sel_Dhl = csB[`PARC_INST_MSG_OP1_SEL];
 
-  // ALU Function --> assigned aluA_fn in addition to alu0_fn
+  // ALU Function --> assigned aluA_fn / aluB_fn in addition to alu0_fn
 
     wire [3:0] alu0_fn_Dhl = cs0[`PARC_INST_MSG_ALU_FN];
 
     wire [3:0] aluA_fn_Dhl = csA[`PARC_INST_MSG_ALU_FN];
+    wire [3:0] aluB_fn_Dhl = csB[`PARC_INST_MSG_ALU_FN];
 
   // Muldiv Function --> changed from cs0 to csA because only aluA has muldiv
 
@@ -872,13 +877,16 @@ module parc_CoreCtrl
 
     wire memex_mux_sel_Dhl = csA[`PARC_INST_MSG_WB_SEL];
 
-  // Register Writeback Controls --> added rfA in addition to rf0
+  // Register Writeback Controls --> added rfA / rfB in addition to rf0
 
     wire rf0_wen_Dhl         = cs0[`PARC_INST_MSG_RF_WEN];
     wire [4:0] rf0_waddr_Dhl = cs0[`PARC_INST_MSG_RF_WADDR];
 
     wire rfA_wen_Dhl         = csA[`PARC_INST_MSG_RF_WEN];
     wire [4:0] rfA_waddr_Dhl = csA[`PARC_INST_MSG_RF_WADDR];
+
+    wire rfB_wen_Dhl         = csB[`PARC_INST_MSG_RF_WEN];
+    wire [4:0] rfB_waddr_Dhl = csB[`PARC_INST_MSG_RF_WADDR];
 
   // Coprocessor write enable --> no goddamn clue what this is --> changed to A b/c only using alu A rn
 
@@ -1022,7 +1030,8 @@ module parc_CoreCtrl
   reg [31:0] irA_X0hl;              // changed from ir0 to irA / irB
   reg [31:0] irB_X0hl;
   reg  [2:0] br_sel_X0hl;
-  reg  [3:0] aluA_fn_X0hl;          // changed from alu0 to aluA
+  reg  [3:0] aluA_fn_X0hl;          // changed from alu0 to aluA / aluB
+  reg  [3:0] aluB_fn_X0hl;
   reg        muldivreq_val_X0hl;
   reg  [2:0] muldivreq_msg_fn_X0hl;
   reg        muldiv_mux_sel_X0hl;
@@ -1036,6 +1045,8 @@ module parc_CoreCtrl
   reg        memex_mux_sel_X0hl;
   reg        rfA_wen_X0hl;          // changed from rf0 to rfA
   reg  [4:0] rfA_waddr_X0hl;
+  reg        rfB_wen_X0hl;
+  reg  [4:0] rfB_waddr_X0hl;
   reg        cp0_wen_X0hl;
   reg  [4:0] cp0_addr_X0hl;
 
@@ -1052,6 +1063,7 @@ module parc_CoreCtrl
       irB_X0hl              <= irB_Dhl;
       br_sel_X0hl           <= br_sel_Dhl;
       aluA_fn_X0hl          <= aluA_fn_Dhl;
+      aluB_fn_X0hl          <= aluB_fn_Dhl;
       muldivreq_val_X0hl    <= muldivreq_val_Dhl;
       muldivreq_msg_fn_X0hl <= muldivreq_msg_fn_Dhl;
       muldiv_mux_sel_X0hl   <= muldiv_mux_sel_Dhl;
@@ -1065,6 +1077,8 @@ module parc_CoreCtrl
       memex_mux_sel_X0hl    <= memex_mux_sel_Dhl;
       rfA_wen_X0hl          <= rfA_wen_Dhl;
       rfA_waddr_X0hl        <= rfA_waddr_Dhl;
+      rfB_wen_X0hl          <= rfB_wen_Dhl;
+      rfB_waddr_X0hl        <= rfB_waddr_Dhl;
       cp0_wen_X0hl          <= cp0_wen_Dhl;
       cp0_addr_X0hl         <= cp0_addr_Dhl;
 
@@ -1162,8 +1176,10 @@ module parc_CoreCtrl
   reg        memex_mux_sel_X1hl;
   reg        execute_mux_sel_X1hl;
   reg        muldiv_mux_sel_X1hl;
-  reg        rfA_wen_X1hl;    // changed from rf0 to rfA
+  reg        rfA_wen_X1hl;    // changed from rf0 to rfA / rfB
   reg  [4:0] rfA_waddr_X1hl;
+  reg        rfB_wen_X1hl;
+  reg  [4:0] rfB_waddr_X1hl;
   reg        cp0_wen_X1hl;
   reg  [4:0] cp0_addr_X1hl;
 
@@ -1189,6 +1205,8 @@ module parc_CoreCtrl
       muldiv_mux_sel_X1hl   <= muldiv_mux_sel_X0hl;
       rfA_wen_X1hl          <= rfA_wen_X0hl;
       rfA_waddr_X1hl        <= rfA_waddr_X0hl;
+      rfB_wen_X1hl          <= rfB_wen_X0hl;
+      rfB_waddr_X1hl        <= rfB_waddr_X0hl;
       cp0_wen_X1hl          <= cp0_wen_X0hl;
       cp0_addr_X1hl         <= cp0_addr_X0hl;
 
@@ -1241,8 +1259,10 @@ module parc_CoreCtrl
   reg [31:0] irB_X2hl; 
   reg        is_muldiv_X2hl;
   reg        dmemresp_queue_val_X1hl;
-  reg        rfA_wen_X2hl;            // changed from rf0 to rfA
+  reg        rfA_wen_X2hl;            // changed from rf0 to rfA / rfB
   reg  [4:0] rfA_waddr_X2hl;
+  reg        rfB_wen_X2hl; 
+  reg  [4:0] rfB_waddr_X2hl;
   reg        cp0_wen_X2hl;
   reg  [4:0] cp0_addr_X2hl;
   reg        execute_mux_sel_X2hl;
@@ -1263,6 +1283,8 @@ module parc_CoreCtrl
       muldiv_mux_sel_X2hl   <= muldiv_mux_sel_X1hl;
       rfA_wen_X2hl          <= rfA_wen_X1hl;
       rfA_waddr_X2hl        <= rfA_waddr_X1hl;
+      rfB_wen_X2hl          <= rfB_wen_X1hl;
+      rfB_waddr_X2hl        <= rfB_waddr_X1hl;
       cp0_wen_X2hl          <= cp0_wen_X1hl;
       cp0_addr_X2hl         <= cp0_addr_X1hl;
       execute_mux_sel_X2hl  <= execute_mux_sel_X1hl;
@@ -1302,8 +1324,10 @@ module parc_CoreCtrl
   reg [31:0] irA_X3hl;              // changed from ir0 to irA / irB
   reg [31:0] irB_X3hl;
   reg        is_muldiv_X3hl;
-  reg        rfA_wen_X3hl;          // changed from rf0 to rfA
+  reg        rfA_wen_X3hl;          // changed from rf0 to rfA / rfB
   reg  [4:0] rfA_waddr_X3hl;
+  reg        rfB_wen_X3hl; 
+  reg  [4:0] rfB_waddr_X3hl;
   reg        cp0_wen_X3hl;
   reg  [4:0] cp0_addr_X3hl;
   reg        execute_mux_sel_X3hl;
@@ -1324,6 +1348,8 @@ module parc_CoreCtrl
       muldiv_mux_sel_X3hl   <= muldiv_mux_sel_X2hl;
       rfA_wen_X3hl          <= rfA_wen_X2hl;
       rfA_waddr_X3hl        <= rfA_waddr_X2hl;
+      rfB_wen_X3hl          <= rfB_wen_X2hl;
+      rfB_waddr_X3hl        <= rfB_waddr_X2hl;
       cp0_wen_X3hl          <= cp0_wen_X2hl;
       cp0_addr_X3hl         <= cp0_addr_X2hl;
       execute_mux_sel_X3hl  <= execute_mux_sel_X2hl;
@@ -1361,8 +1387,10 @@ module parc_CoreCtrl
 
   reg [31:0] irA_Whl;         // changed from ir0 to irA / irB
   reg [31:0] irB_Whl;
-  reg        rfA_wen_Whl;     // changed from rf0 to rfA
+  reg        rfA_wen_Whl;     // changed from rf0 to rfA / rfB
   reg  [4:0] rfA_waddr_Whl;
+  reg        rfB_wen_Whl;
+  reg  [4:0] rfB_waddr_Whl;
   reg        cp0_wen_Whl;
   reg  [4:0] cp0_addr_Whl;
 
@@ -1379,6 +1407,8 @@ module parc_CoreCtrl
       irB_Whl          <= irB_X3hl;
       rfA_wen_Whl      <= rfA_wen_X3hl;
       rfA_waddr_Whl    <= rfA_waddr_X3hl;
+      rfB_wen_Whl      <= rfB_wen_X3hl;
+      rfB_waddr_Whl    <= rfB_waddr_X3hl;
       cp0_wen_Whl      <= cp0_wen_X3hl;
       cp0_addr_Whl     <= cp0_addr_X3hl;
 
@@ -1396,7 +1426,8 @@ module parc_CoreCtrl
 
   // Only set register file wen if stage is valid
 
-  assign rfA_wen_out_Whl = ( inst_val_Whl && !stall_Whl && rfA_wen_Whl );   // changed from rf0 to rfA
+  assign rfA_wen_out_Whl = ( inst_val_Whl && !stall_Whl && rfA_wen_Whl );   // changed from rf0 to rfA / rfB
+  assign rfB_wen_out_Whl = ( inst_val_Whl && !stall_Whl && rfB_wen_Whl );   // changed from rf0 to rfA / rfB
 
   // Dummy squash and stall signals
 
@@ -1414,7 +1445,7 @@ module parc_CoreCtrl
   always @ ( posedge clk ) begin
     irA_debug       <= irA_Whl;
     inst_val_debug  <= inst_val_Whl;
-    irB_debug       <= 32'b0; // FIXME!
+    irB_debug       <= irB_Whl; // FIXME! --> fized??
   end
 
   //----------------------------------------------------------------------
