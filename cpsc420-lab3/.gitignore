@@ -1,3 +1,4 @@
 test_outputs/
 build/*.out
 tests/build/vmh/*.vcd
+ubmark/build/vmh/*.vcd
