@@ -912,9 +912,9 @@ module parc_CoreCtrl
                             || ( inst_val_X2hl && rs0_en_Dhl && rfA_wen_X2hl
                                   && ( rs0_addr_Dhl == rfA_waddr_X2hl )
                                   && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl )
-                            || ( inst_val_X3hl && rs0_en_Dhl && rfA_wen_X3hl
-                                  && ( rs0_addr_Dhl == rfA_waddr_X3hl )
-                                  && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl )
+                            // || ( inst_val_X3hl && rs0_en_Dhl && rfA_wen_X3hl
+                            //       && ( rs0_addr_Dhl == rfA_waddr_X3hl )
+                            //       && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl )
                             || ( inst_val_X0hl && rt0_en_Dhl && rfA_wen_X0hl
                                   && ( rt0_addr_Dhl == rfA_waddr_X0hl )
                                   && ( rfA_waddr_X0hl != 5'd0 ) && is_muldiv_X0hl )
@@ -923,10 +923,10 @@ module parc_CoreCtrl
                                   && ( rfA_waddr_X1hl != 5'd0 ) && is_muldiv_X1hl )
                             || ( inst_val_X2hl && rt0_en_Dhl && rfA_wen_X2hl
                                   && ( rt0_addr_Dhl == rfA_waddr_X2hl )
-                                  && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl )
-                            || ( inst_val_X3hl && rt0_en_Dhl && rfA_wen_X3hl
-                                  && ( rt0_addr_Dhl == rfA_waddr_X3hl )
-                                  && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl ));
+                                  && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl ));
+                            // || ( inst_val_X3hl && rt0_en_Dhl && rfA_wen_X3hl
+                            //       && ( rt0_addr_Dhl == rfA_waddr_X3hl )
+                            //       && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl ));
     
     wire stall_1_muldiv_use_Dhl = inst_val_Dhl && (
                                 ( inst_val_X0hl && rs1_en_Dhl && rfA_wen_X0hl
@@ -938,9 +938,9 @@ module parc_CoreCtrl
                             || ( inst_val_X2hl && rs1_en_Dhl && rfA_wen_X2hl
                                   && ( rs1_addr_Dhl == rfA_waddr_X2hl )
                                   && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl )
-                            || ( inst_val_X3hl && rs1_en_Dhl && rfA_wen_X3hl
-                                  && ( rs1_addr_Dhl == rfA_waddr_X3hl )
-                                  && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl )
+                            // || ( inst_val_X3hl && rs1_en_Dhl && rfA_wen_X3hl
+                            //       && ( rs1_addr_Dhl == rfA_waddr_X3hl )
+                            //       && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl )
                             || ( inst_val_X0hl && rt1_en_Dhl && rfA_wen_X0hl
                                   && ( rt1_addr_Dhl == rfA_waddr_X0hl )
                                   && ( rfA_waddr_X0hl != 5'd0 ) && is_muldiv_X0hl )
@@ -949,10 +949,10 @@ module parc_CoreCtrl
                                   && ( rfA_waddr_X1hl != 5'd0 ) && is_muldiv_X1hl )
                             || ( inst_val_X2hl && rt1_en_Dhl && rfA_wen_X2hl
                                   && ( rt1_addr_Dhl == rfA_waddr_X2hl )
-                                  && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl )
-                            || ( inst_val_X3hl && rt1_en_Dhl && rfA_wen_X3hl
-                                  && ( rt1_addr_Dhl == rfA_waddr_X3hl )
-                                  && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl ));
+                                  && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl ));
+                            // || ( inst_val_X3hl && rt1_en_Dhl && rfA_wen_X3hl
+                            //       && ( rt1_addr_Dhl == rfA_waddr_X3hl )
+                            //       && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl ));
 
     // Stall for load-use only if instruction in D is valid and either of
     // the source registers match the destination register of of a valid

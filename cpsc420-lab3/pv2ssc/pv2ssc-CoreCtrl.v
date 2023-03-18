@@ -591,6 +591,11 @@ module parc_CoreCtrl
   */
 
   reg steering_mux_sel;
+  reg steer_stall;
+
+  wire stall_non_steer 
+    = (steering_mux_sel == 1'b0 && stall_0_Dhl) 
+    ||(steering_mux_sel == 1'b1 && (stall_1_Dhl || brj_taken_X0hl || brj_taken_Dhl));
   
   always @( posedge clk )
   begin
@@ -599,12 +604,22 @@ module parc_CoreCtrl
     end
     else begin
       // idk how these conditions work
-      if (   (steering_mux_sel == 1'b0 && stall_0_Dhl) 
-          || (steering_mux_sel == 1'b1 && (stall_1_Dhl || brj_taken_X0hl || brj_taken_Dhl)) ) begin
+      if ( stall_non_steer ) begin
         steering_mux_sel <= steering_mux_sel;
+
+        if (steering_mux_sel == 1'b0) begin
+          steer_stall <= 1'b0;
+        end
       end
       else begin
         steering_mux_sel <= ~steering_mux_sel;
+
+        if (steering_mux_sel == 1'b0) begin
+          steer_stall <= 1'b0;
+        end
+        else begin
+          steer_stall <= 1'b1;
+        end
       end
     end
   end
@@ -920,9 +935,9 @@ module parc_CoreCtrl
                             || ( inst_val_X2hl && rs0_en_Dhl && rfA_wen_X2hl
                                   && ( rs0_addr_Dhl == rfA_waddr_X2hl )
                                   && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl )
-                            || ( inst_val_X3hl && rs0_en_Dhl && rfA_wen_X3hl
-                                  && ( rs0_addr_Dhl == rfA_waddr_X3hl )
-                                  && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl )
+                            // || ( inst_val_X3hl && rs0_en_Dhl && rfA_wen_X3hl
+                            //       && ( rs0_addr_Dhl == rfA_waddr_X3hl )
+                            //       && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl )
                             || ( inst_val_X0hl && rt0_en_Dhl && rfA_wen_X0hl
                                   && ( rt0_addr_Dhl == rfA_waddr_X0hl )
                                   && ( rfA_waddr_X0hl != 5'd0 ) && is_muldiv_X0hl )
@@ -931,10 +946,10 @@ module parc_CoreCtrl
                                   && ( rfA_waddr_X1hl != 5'd0 ) && is_muldiv_X1hl )
                             || ( inst_val_X2hl && rt0_en_Dhl && rfA_wen_X2hl
                                   && ( rt0_addr_Dhl == rfA_waddr_X2hl )
-                                  && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl )
-                            || ( inst_val_X3hl && rt0_en_Dhl && rfA_wen_X3hl
-                                  && ( rt0_addr_Dhl == rfA_waddr_X3hl )
-                                  && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl ));
+                                  && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl ));
+                            // || ( inst_val_X3hl && rt0_en_Dhl && rfA_wen_X3hl
+                            //       && ( rt0_addr_Dhl == rfA_waddr_X3hl )
+                            //       && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl ));
     
     wire stall_1_muldiv_use_Dhl = inst_val_Dhl && (
                                 ( inst_val_X0hl && rs1_en_Dhl && rfA_wen_X0hl
@@ -946,9 +961,9 @@ module parc_CoreCtrl
                             || ( inst_val_X2hl && rs1_en_Dhl && rfA_wen_X2hl
                                   && ( rs1_addr_Dhl == rfA_waddr_X2hl )
                                   && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl )
-                            || ( inst_val_X3hl && rs1_en_Dhl && rfA_wen_X3hl
-                                  && ( rs1_addr_Dhl == rfA_waddr_X3hl )
-                                  && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl )
+                            // || ( inst_val_X3hl && rs1_en_Dhl && rfA_wen_X3hl
+                            //       && ( rs1_addr_Dhl == rfA_waddr_X3hl )
+                            //       && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl )
                             || ( inst_val_X0hl && rt1_en_Dhl && rfA_wen_X0hl
                                   && ( rt1_addr_Dhl == rfA_waddr_X0hl )
                                   && ( rfA_waddr_X0hl != 5'd0 ) && is_muldiv_X0hl )
@@ -957,10 +972,10 @@ module parc_CoreCtrl
                                   && ( rfA_waddr_X1hl != 5'd0 ) && is_muldiv_X1hl )
                             || ( inst_val_X2hl && rt1_en_Dhl && rfA_wen_X2hl
                                   && ( rt1_addr_Dhl == rfA_waddr_X2hl )
-                                  && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl )
-                            || ( inst_val_X3hl && rt1_en_Dhl && rfA_wen_X3hl
-                                  && ( rt1_addr_Dhl == rfA_waddr_X3hl )
-                                  && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl ));
+                                  && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl ));
+                            // || ( inst_val_X3hl && rt1_en_Dhl && rfA_wen_X3hl
+                            //       && ( rt1_addr_Dhl == rfA_waddr_X3hl )
+                            //       && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl ));
 
     // Stall for load-use only if instruction in D is valid and either of
     // the source registers match the destination register of of a valid
@@ -1007,7 +1022,7 @@ module parc_CoreCtrl
     // i'm not really sure why adding the additional condition to the steering stall
     // fixed some kind of data error, but it doesn't work properly without !brj_taken
     wire stall_steer_Dhl 
-      = ( steering_mux_sel == 1'b0 
+      = ( (steering_mux_sel == 1'b0)
       && !brj_taken_X0hl 
       && !brj_taken_Dhl 
       && inst_val_Dhl ); // this line is because jumps introduce invalid instructions
