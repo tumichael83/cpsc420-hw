@@ -700,70 +700,70 @@ module parc_CoreCtrl
     else begin
       for ( i=0; i<32; i=i+1 ) begin
         // initial step
-        if ( !stall_X0hl && 
-           ( rfA_wen_Dhl && instA_rd_Dhl != 5'b0 && i == instA_rd_Dhl)) 
-        begin
+          if ( !stall_X0hl && 
+            ( rfA_wen_Dhl && instA_rd_Dhl != 5'b0 && i == instA_rd_Dhl)) 
+          begin
 
-          scoreboard[i][8] <= 1'b0;
+            scoreboard[i][8] <= 1'b0;
 
-          if ( is_A_load_Dhl ) begin
-            scoreboard[i][7:6] <= op_mem;
-            scoreboard[i][5]   <= 1;
+            if ( is_A_load_Dhl ) begin
+              scoreboard[i][7:6] <= op_mem;
+              scoreboard[i][5]   <= 1;
+            end
+            else if ( is_A_muldiv_Dhl ) begin
+              scoreboard[i][7:6] <= op_muldiv;
+              scoreboard[i][5]   <= 1;
+            end
+            else begin
+              scoreboard[i][7:6] <= op_alu;
+              scoreboard[i][5]   <= 0;
+            end
+
+            scoreboard[i][0] <= 1;
           end
-          else if ( is_A_muldiv_Dhl ) begin
-            scoreboard[i][7:6] <= op_muldiv;
-            scoreboard[i][5]   <= 1;
+          else if ( !stall_X0hl && 
+            ( rfB_wen_Dhl && instB_rd_Dhl != 5'b0 && i == instB_rd_Dhl)) 
+          begin
+            scoreboard[i][8] <= 1'b1;
+            scoreboard[i][7:6] <= op_alu;
+            scoreboard[i][5] <= 1'b0;
+            scoreboard[i][0] <= 1;
           end
           else begin
-            scoreboard[i][7:6] <= op_alu;
-            scoreboard[i][5]   <= 0;
+            scoreboard[i][0] <= 0;
           end
-
-          scoreboard[i][0] <= 1;
-        end
-        else if ( !stall_X0hl && 
-           ( rfB_wen_Dhl && instB_rd_Dhl != 5'b0 && i == instB_rd_Dhl)) 
-        begin
-          scoreboard[i][8] <= 1'b1;
-          scoreboard[i][7:6] <= op_alu;
-          scoreboard[i][5] <= 1'b0;
-          scoreboard[i][0] <= 1;
-        end
-        else begin
-          scoreboard[i][0] <= 0;
-        end
 
         // update steps (haven't accounted for squashing?)
-        if ( !stall_X1hl ) begin
-          scoreboard[i][1] <= scoreboard[i][0];
-          if ( scoreboard[i][7:6] == op_mem && scoreboard[i][0] ) begin
-            scoreboard[i][5] <= 0;
+          if ( !stall_X1hl ) begin
+            scoreboard[i][1] <= scoreboard[i][0];
+            if ( scoreboard[i][7:6] == op_mem && scoreboard[i][0] ) begin
+              scoreboard[i][5] <= 0;
+            end
           end
-        end
-        else begin
-          scoreboard[i][1] <= scoreboard[i][1];
-        end
-        if ( !stall_X2hl ) begin
-          scoreboard[i][2] <= scoreboard[i][1];
-        end
-        else begin
-          scoreboard[i][2] <= scoreboard[i][2];
-        end
-        if ( !stall_X3hl ) begin
-          scoreboard[i][3] <= scoreboard[i][2];
-          if ( scoreboard[i][7:6] == op_muldiv && scoreboard[i][2] && !scoreboard[i][1] && !scoreboard[i][0]) begin
-            scoreboard[i][5] <= 0;
+          else begin
+            scoreboard[i][1] <= scoreboard[i][1];
           end
-        end
-        else begin
-          scoreboard[i][3] <= scoreboard[i][3];
-        end
-        if ( !stall_Whl ) begin
-          scoreboard[i][4] <= scoreboard[i][3];
-        end
-        else begin
-          scoreboard[i][4] <= scoreboard[i][4];
-        end
+          if ( !stall_X2hl ) begin
+            scoreboard[i][2] <= scoreboard[i][1];
+          end
+          else begin
+            scoreboard[i][2] <= scoreboard[i][2];
+          end
+          if ( !stall_X3hl ) begin
+            scoreboard[i][3] <= scoreboard[i][2];
+            if ( scoreboard[i][7:6] == op_muldiv && scoreboard[i][2] && !scoreboard[i][1] && !scoreboard[i][0]) begin
+              scoreboard[i][5] <= 0;
+            end
+          end
+          else begin
+            scoreboard[i][3] <= scoreboard[i][3];
+          end
+          if ( !stall_Whl ) begin
+            scoreboard[i][4] <= scoreboard[i][3];
+          end
+          else begin
+            scoreboard[i][4] <= scoreboard[i][4];
+          end
       end
     end
   end
