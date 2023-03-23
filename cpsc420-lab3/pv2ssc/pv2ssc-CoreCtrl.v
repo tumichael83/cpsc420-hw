@@ -707,50 +707,6 @@ module parc_CoreCtrl
     end
   end
 
-
-  // Old, single-pipeline steering logic
-    reg steering_mux_sel;
-
-    wire stall_non_steer 
-      = (steering_mux_sel == 1'b0 && stall_0_Dhl) 
-      ||(steering_mux_sel == 1'b1 && (stall_1_Dhl || brj_taken_X0hl || brj_taken_Dhl));
-    
-    always @( posedge clk )
-    begin
-      if ( reset ) begin
-        steering_mux_sel <= 1'b1;
-      end
-      else begin
-        // idk how these conditions work
-        if ( stall_non_steer ) begin
-          steering_mux_sel <= steering_mux_sel;
-        end
-        else begin
-          steering_mux_sel <= ~steering_mux_sel;
-        end
-      end
-    end
-
-    always @(*)
-    begin
-      if ( steering_mux_sel == 1'b0 )
-      begin
-        csA = cs0;
-        csB = {cs_sz{1'bx}};
-
-        irA_Dhl = ir0_Dhl;
-        irB_Dhl = `PARC_INST_MSG_NOP;
-      end
-      else if ( steering_mux_sel == 1'b1 )
-      begin
-        csA = cs1;
-        csB = {cs_sz{1'bx}};
-
-        irA_Dhl = ir1_Dhl;
-        irB_Dhl = `PARC_INST_MSG_NOP;
-      end
-    end
-
   // SCOREBOARD
 
   /*
