@@ -721,6 +721,14 @@ module parc_CoreCtrl
 
           scoreboard[i][0] <= 1;
         end
+        else if ( !stall_X0hl && 
+           ( rfB_wen_Dhl && instB_rd_Dhl != 5'b0 && i == instB_rd_Dhl)) 
+        begin
+          scoreboard[i][8] <= 1'b1;
+          scoreboard[i][7:6] <= op_alu;
+          scoreboard[i][5] <= 1'b0;
+          scoreboard[i][0] <= 1;
+        end
         else begin
           scoreboard[i][0] <= 0;
         end
