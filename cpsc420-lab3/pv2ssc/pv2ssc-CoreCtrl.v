@@ -1172,19 +1172,19 @@ module parc_CoreCtrl
     wire stall_0_Dhl = (stall_X0hl || stall_0_muldiv_use_Dhl || stall_0_load_use_Dhl);
     wire stall_1_Dhl = (stall_X0hl || stall_1_muldiv_use_Dhl || stall_1_load_use_Dhl);
 
-    wire stall_A_Dhl 
+    wire old_stall_A_Dhl 
       = ( steering_mux_sel == 1'b0 ) ? stall_0_Dhl
       : ( steering_mux_sel == 1'b1 ) ? stall_1_Dhl
       :                                1'bx;
 
-    wire my_stall_A_Dhl 
+    wire stall_A_Dhl 
       = inst_val_Dhl && (scoreboard[instA_rs_Dhl][5] || scoreboard[instA_rs_Dhl][5]);
 
     wire [7:0] sb4_debug = scoreboard[4];
 
     
 
-    wire stall_A_Dhl_DEBUG = (my_stall_A_Dhl == stall_A_Dhl);
+    wire stall_A_Dhl_DEBUG = (old_stall_A_Dhl == stall_A_Dhl);
 
     // i'm not really sure why adding the additional condition to the steering stall
     // fixed some kind of data error, but it doesn't work properly without !brj_taken
@@ -1200,7 +1200,7 @@ module parc_CoreCtrl
 
     // Next bubble bit
 
-    wire bubble_sel_Dhl  = ( squash_Dhl || my_stall_A_Dhl ); // I'm also unsure whether this should be stall_0
+    wire bubble_sel_Dhl  = ( squash_Dhl || stall_A_Dhl ); // I'm also unsure whether this should be stall_0
     wire bubble_next_Dhl = ( !bubble_sel_Dhl ) ? bubble_Dhl
                          : ( bubble_sel_Dhl  ) ? 1'b1
                          :                       1'bx;
