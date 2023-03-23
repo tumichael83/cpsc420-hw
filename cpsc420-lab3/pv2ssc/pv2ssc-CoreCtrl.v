@@ -635,7 +635,7 @@ module parc_CoreCtrl
   reg [31:0] irA_Dhl;         // raw instruction
   reg [31:0] irB_Dhl;
 
-  always @ ( posedge clk ) begin
+  always @( posedge clk ) begin
     if ( reset ) begin
       pipe_A_mux_sel <= stall;
       pipe_B_mux_sel <= stall;
@@ -679,6 +679,33 @@ module parc_CoreCtrl
     end
   end
 
+  always @( * ) begin
+    if ( pipe_A_mux_sel == op0 ) begin
+      csA     <= cs0;
+      irA_Dhl <= ir0_Dhl;
+    end
+    else if ( pipe_A_mux_sel == op1 ) begin
+      csA     <= cs1;
+      irA_Dhl <= ir1_Dhl;
+    end
+    else if ( pipe_A_mux_sel == stall ) begin
+      csA     <= csA;
+      irA_Dhl <= irA_Dhl;
+    end
+
+    if ( pipe_B_mux_sel == op0 ) begin
+      csB     <= cs0;
+      irB_Dhl <= ir0_Dhl;
+    end
+    else if ( pipe_B_mux_sel == op1 ) begin
+      csB     <= cs1;
+      irB_Dhl <= ir1_Dhl;
+    end
+    else if ( pipe_B_mux_sel == stall ) begin
+      csB     <= csB;
+      irB_Dhl <= irB_Dhl;
+    end
+  end
 
 
   // Old, single-pipeline steering logic
@@ -759,7 +786,7 @@ module parc_CoreCtrl
       for ( i=0; i<32; i=i+1 ) begin
         // initial step
           if ( !stall_X0hl && 
-            ( rfA_wen_Dhl && instA_rd_Dhl != 5'b0 && i == instA_rd_Dhl)) 
+            ( rfA_wen_Dhl && instA_rd_Dhl != 5'b0 && i == instA_rd_Dhl)) // pipeline A
           begin
 
             scoreboard[i][8] <= 1'b0;
@@ -780,7 +807,7 @@ module parc_CoreCtrl
             scoreboard[i][0] <= 1;
           end
           else if ( !stall_X0hl && 
-            ( rfB_wen_Dhl && instB_rd_Dhl != 5'b0 && i == instB_rd_Dhl)) 
+            ( rfB_wen_Dhl && instB_rd_Dhl != 5'b0 && i == instB_rd_Dhl)) // pipeline B
           begin
             scoreboard[i][8] <= 1'b1;
             scoreboard[i][7:6] <= op_alu;
