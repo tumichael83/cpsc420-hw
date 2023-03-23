@@ -638,7 +638,7 @@ module parc_CoreCtrl
       csB = {cs_sz{1'bx}};
 
       irA_Dhl = ir0_Dhl;
-      irB_Dhl = 31'bx;
+      irB_Dhl = `PARC_INST_MSG_NOP;
     end
     else if ( steering_mux_sel == 1'b1 )
     begin
@@ -646,7 +646,7 @@ module parc_CoreCtrl
       csB = {cs_sz{1'bx}};
 
       irA_Dhl = ir1_Dhl;
-      irB_Dhl = 31'bx;
+      irB_Dhl = `PARC_INST_MSG_NOP;
     end
   end
 
@@ -670,6 +670,7 @@ module parc_CoreCtrl
 
   reg [4:0] scoreboard  [31:0];
   integer i;
+  integer j;
 
   always @ ( posedge clk ) begin
     if ( reset ) begin
@@ -677,12 +678,16 @@ module parc_CoreCtrl
     end
     else begin
       for ( i=0; i<32; i=i+1 ) begin
-        if ( !stall_X0hl && i == instA_rd_Dhl ) begin
+        // initial step
+        if ( !stall_X0hl && 
+             (rfA_wen_Dhl && instA_rd_Dhl != 5'b0 && i == instA_rd_Dhl)) begin
           scoreboard[i][0] <= 1;
         end
         else begin
           scoreboard[i][0] <= 0;
         end
+
+        // update steps (haven't accounted for squashing?)
         if ( !stall_X1hl ) begin
           scoreboard[i][1] <= scoreboard[i][0];
         end
@@ -711,24 +716,51 @@ module parc_CoreCtrl
     end
   end
 
+  // bypass debug wires
+  wire opA0_byp_mux_sel_Dhl_DEBUG = (opA0_byp_mux_sel_Dhl == old_opA0_byp_mux_sel_Dhl);
+  wire opA1_byp_mux_sel_Dhl_DEBUG = (opA1_byp_mux_sel_Dhl == old_opA1_byp_mux_sel_Dhl);
+  wire [5:0] reg2_DEBUG = scoreboard[2];
+  wire reg2_X2_DEBUG = scoreboard[instA_rs_Dhl][2];
+
   wire  [4:0] instA_rd_Dhl = rfA_waddr_Dhl;
   wire  [4:0] instA_rs_Dhl = ( steering_mux_sel == 1'b0 ) ? inst0_rs_Dhl : inst1_rs_Dhl;
   wire  [4:0] instA_rt_Dhl = ( steering_mux_sel == 1'b0 ) ? inst0_rt_Dhl : inst1_rt_Dhl;
 
+  wire  [4:0] instB_rd_Dhl = rfB_waddr_Dhl;
+  // TODO: get actual values for instB_rs and rt
+  wire  [4:0] instB_rs_Dhl = ( steering_mux_sel == 1'b0 ) ? inst0_rs_Dhl : inst1_rs_Dhl;
+  wire  [4:0] instB_rt_Dhl = ( steering_mux_sel == 1'b0 ) ? inst0_rt_Dhl : inst1_rt_Dhl;
+
   assign opA0_byp_mux_sel_Dhl
-    = ( scoreboard[instA_rs_Dhl][0] ) ? am_AX0_byp
-    : ( scoreboard[instA_rs_Dhl][1] ) ? am_AX1_byp
-    : ( scoreboard[instA_rs_Dhl][2] ) ? am_AX2_byp
-    : ( scoreboard[instA_rs_Dhl][3] ) ? am_AX3_byp
-    : ( scoreboard[instA_rs_Dhl][4] ) ? am_AW_byp 
-    :                                   am_r0;
+    = ( inst_val_X0hl && scoreboard[instA_rs_Dhl][0] ) ? am_AX0_byp
+    : ( inst_val_X1hl && scoreboard[instA_rs_Dhl][1] ) ? am_AX1_byp
+    : ( inst_val_X2hl && scoreboard[instA_rs_Dhl][2] ) ? am_AX2_byp
+    : ( inst_val_X3hl && scoreboard[instA_rs_Dhl][3] ) ? am_AX3_byp
+    : ( inst_val_Whl  && scoreboard[instA_rs_Dhl][4] ) ? am_AW_byp 
+    :                                                    am_r0;
 
   assign opA1_byp_mux_sel_Dhl
-    = ( scoreboard[instA_rt_Dhl][0] ) ? bm_AX0_byp
-    : ( scoreboard[instA_rt_Dhl][1] ) ? bm_AX1_byp
-    : ( scoreboard[instA_rt_Dhl][2] ) ? bm_AX2_byp
-    : ( scoreboard[instA_rt_Dhl][3] ) ? bm_AX3_byp
-    : ( scoreboard[instA_rt_Dhl][4] ) ? bm_AW_byp 
+    = ( inst_val_X0hl && scoreboard[instA_rt_Dhl][0] ) ? bm_AX0_byp
+    : ( inst_val_X1hl && scoreboard[instA_rt_Dhl][1] ) ? bm_AX1_byp
+    : ( inst_val_X2hl && scoreboard[instA_rt_Dhl][2] ) ? bm_AX2_byp
+    : ( inst_val_X3hl && scoreboard[instA_rt_Dhl][3] ) ? bm_AX3_byp
+    : ( inst_val_Whl  && scoreboard[instA_rt_Dhl][4] ) ? bm_AW_byp 
+    :                                   bm_r1;
+
+  assign opB0_byp_mux_sel_Dhl
+    = ( inst_val_X0hl && scoreboard[instB_rs_Dhl][0] ) ? am_BX0_byp
+    : ( inst_val_X1hl && scoreboard[instB_rs_Dhl][1] ) ? am_BX1_byp
+    : ( inst_val_X2hl && scoreboard[instB_rs_Dhl][2] ) ? am_BX2_byp
+    : ( inst_val_X3hl && scoreboard[instB_rs_Dhl][3] ) ? am_BX3_byp
+    : ( inst_val_Whl  && scoreboard[instB_rs_Dhl][4] ) ? am_BW_byp 
+    :                                   am_r0;
+
+  assign opB1_byp_mux_sel_Dhl
+    = ( inst_val_X0hl && scoreboard[instB_rt_Dhl][0] ) ? bm_BX0_byp
+    : ( inst_val_X1hl && scoreboard[instB_rt_Dhl][1] ) ? bm_BX1_byp
+    : ( inst_val_X2hl && scoreboard[instB_rt_Dhl][2] ) ? bm_BX2_byp
+    : ( inst_val_X3hl && scoreboard[instB_rt_Dhl][3] ) ? bm_BX3_byp
+    : ( inst_val_Whl  && scoreboard[instB_rt_Dhl][4] ) ? bm_BW_byp 
     :                                   bm_r1;
 
   // ship instruction for field parsing to datapath
