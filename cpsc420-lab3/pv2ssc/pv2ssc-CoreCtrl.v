@@ -675,10 +675,10 @@ module parc_CoreCtrl
   *   Strategy: giant array of  10(?) bit registers
   *     - which one to access? --> also a register!
   *     - fields for the registers:
-  *       - operation type: ALU, muldiv, mem (2 bits)
-  *       - Busy / Pending (1 bit)
-  *       - Functional Unit A or B (1 bit)
-  *       - stage: X0, X1, X2, X3, W (5 bits, 1 hot encoding)
+  *       - Functional Unit A or B (1 bit)  --> bit 8
+  *       - operation type: ALU, muldiv, mem (2 bits) --> bits 7,6
+  *       - Busy / Pending (1 bit)  --> bit 5
+  *       - stage: X0, X1, X2, X3, W (5 bits, 1 hot encoding) --> bits 4-0
   *
   */
 
@@ -686,8 +686,11 @@ module parc_CoreCtrl
   localparam op_mem     = 2'd1;
   localparam op_muldiv  = 2'd2;
 
+  wire is_A_load_Dhl = ( csA[`PARC_INST_MSG_MEM_REQ] == ld );
+  wire is_A_muldiv_Dhl = ( csA[`PARC_INST_MSG_MULDIV_EN] );
 
-  reg [7:0] scoreboard  [31:0];
+
+  reg [8:0] scoreboard  [31:0];
   integer i;
 
   always @ ( posedge clk ) begin
@@ -701,11 +704,13 @@ module parc_CoreCtrl
            ( rfA_wen_Dhl && instA_rd_Dhl != 5'b0 && i == instA_rd_Dhl)) 
         begin
 
-          if ( is_load_Dhl ) begin
+          scoreboard[i][8] <= 1'b0;
+
+          if ( is_A_load_Dhl ) begin
             scoreboard[i][7:6] <= op_mem;
             scoreboard[i][5]   <= 1;
           end
-          else if ( is_A_muldiv ) begin
+          else if ( is_A_muldiv_Dhl ) begin
             scoreboard[i][7:6] <= op_muldiv;
             scoreboard[i][5]   <= 1;
           end
@@ -723,7 +728,7 @@ module parc_CoreCtrl
         // update steps (haven't accounted for squashing?)
         if ( !stall_X1hl ) begin
           scoreboard[i][1] <= scoreboard[i][0];
-          if ( scoreboard[i][7:6] == op_mem) begin
+          if ( scoreboard[i][7:6] == op_mem && scoreboard[i][0] ) begin
             scoreboard[i][5] <= 0;
           end
         end
@@ -738,7 +743,7 @@ module parc_CoreCtrl
         end
         if ( !stall_X3hl ) begin
           scoreboard[i][3] <= scoreboard[i][2];
-          if ( scoreboard[i][7:6] == op_muldiv) begin
+          if ( scoreboard[i][7:6] == op_muldiv && scoreboard[i][2] && !scoreboard[i][1] && !scoreboard[i][0]) begin
             scoreboard[i][5] <= 0;
           end
         end
@@ -1173,14 +1178,13 @@ module parc_CoreCtrl
       :                                1'bx;
 
     wire my_stall_A_Dhl 
-      = stall_X0hl || inst_val_Dhl && (scoreboard[instA_rs_Dhl][5] || scoreboard[instA_rs_Dhl][5]);
+      = inst_val_Dhl && (scoreboard[instA_rs_Dhl][5] || scoreboard[instA_rs_Dhl][5]);
 
-    wire [7:0] load_rs_DEBUG = scoreboard[instA_rs_Dhl];
-    wire [7:0] load_rt_DEBUG = scoreboard[instA_rt_Dhl];
+    wire [7:0] sb4_debug = scoreboard[4];
 
     
 
-    wire stall_A_Dhl_DEBUG = (my_stall_A_Dhl == my_stall_A_Dhl);
+    wire stall_A_Dhl_DEBUG = (my_stall_A_Dhl == stall_A_Dhl);
 
     // i'm not really sure why adding the additional condition to the steering stall
     // fixed some kind of data error, but it doesn't work properly without !brj_taken
@@ -1196,7 +1200,7 @@ module parc_CoreCtrl
 
     // Next bubble bit
 
-    wire bubble_sel_Dhl  = ( squash_Dhl || stall_A_Dhl ); // I'm also unsure whether this should be stall_0
+    wire bubble_sel_Dhl  = ( squash_Dhl || my_stall_A_Dhl ); // I'm also unsure whether this should be stall_0
     wire bubble_next_Dhl = ( !bubble_sel_Dhl ) ? bubble_Dhl
                          : ( bubble_sel_Dhl  ) ? 1'b1
                          :                       1'bx;
