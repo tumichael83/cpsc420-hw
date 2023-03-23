@@ -588,23 +588,15 @@ module parc_CoreCtrl
     |   n-ALU     |     ALU     |      A      |      B      |
     |     ALU     |   n-ALU     |      B      |      A      |
     |   n-ALU     |   n-ALU     |      A      |stall, then A|
+
+    non-alu: muldiv, memory, jump, branch, mtc0
   */
-  wire is_A_muldiv
-    =   ( irA_Dhl == `PARC_INST_MSG_MUL )   || ( irA_Dhl == `PARC_INST_MSG_DIV )
-    ||  ( irA_Dhl == `PARC_INST_MSG_DIVU )  || ( irA_Dhl == `PARC_INST_MSG_REM )
-    ||  ( irA_Dhl == `PARC_INST_MSG_REMU );
-
-  wire is_1_muldiv
-    =   ( ir1_Dhl == `PARC_INST_MSG_MUL )   || ( ir1_Dhl == `PARC_INST_MSG_DIV )
-    ||  ( ir1_Dhl == `PARC_INST_MSG_DIVU )  || ( ir1_Dhl == `PARC_INST_MSG_REM )
-    ||  ( ir1_Dhl == `PARC_INST_MSG_REMU );
-
-  wire is_1_mem
-    =   ( ir1_Dhl == `PARC_INST_MSG_LW )   || ( ir1_Dhl == `PARC_INST_MSG_LB )
-    ||  ( ir1_Dhl == `PARC_INST_MSG_LBU )  || ( ir1_Dhl == `PARC_INST_MSG_LH )
-    ||  ( ir1_Dhl == `PARC_INST_MSG_LHU )  || ( ir1_Dhl == `PARC_INST_MSG_SW )
-    ||  ( ir1_Dhl == `PARC_INST_MSG_SB )   || ( ir1_Dhl == `PARC_INST_MSG_SH );
-
+  wire is_0_alu
+    =   !cs0[`PARC_INST_MSG_MULDIV_EN]
+    &&  (cs0[`PARC_INST_MSG_MEM_REQ] == nr)
+    &&  !cs0[`PARC_INST_MSG_J_EN]
+    &&  (cs0[`PARC_INST_MSG_BR_SEL] == br_none)
+    &&  !cs0[`PARC_INST_MSG_CP0_WEN];
 
   reg steering_mux_sel;
   reg steer_stall;
