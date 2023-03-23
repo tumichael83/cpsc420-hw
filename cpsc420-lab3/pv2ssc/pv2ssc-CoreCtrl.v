@@ -589,6 +589,22 @@ module parc_CoreCtrl
     |     ALU     |   n-ALU     |      B      |      A      |
     |   n-ALU     |   n-ALU     |      A      |stall, then A|
   */
+  wire is_A_muldiv
+    =   ( irA_Dhl == `PARC_INST_MSG_MUL )   || ( irA_Dhl == `PARC_INST_MSG_DIV )
+    ||  ( irA_Dhl == `PARC_INST_MSG_DIVU )  || ( irA_Dhl == `PARC_INST_MSG_REM )
+    ||  ( irA_Dhl == `PARC_INST_MSG_REMU );
+
+  wire is_1_muldiv
+    =   ( ir1_Dhl == `PARC_INST_MSG_MUL )   || ( ir1_Dhl == `PARC_INST_MSG_DIV )
+    ||  ( ir1_Dhl == `PARC_INST_MSG_DIVU )  || ( ir1_Dhl == `PARC_INST_MSG_REM )
+    ||  ( ir1_Dhl == `PARC_INST_MSG_REMU );
+
+  wire is_1_mem
+    =   ( ir1_Dhl == `PARC_INST_MSG_LW )   || ( ir1_Dhl == `PARC_INST_MSG_LB )
+    ||  ( ir1_Dhl == `PARC_INST_MSG_LBU )  || ( ir1_Dhl == `PARC_INST_MSG_LH )
+    ||  ( ir1_Dhl == `PARC_INST_MSG_LHU )  || ( ir1_Dhl == `PARC_INST_MSG_SW )
+    ||  ( ir1_Dhl == `PARC_INST_MSG_SB )   || ( ir1_Dhl == `PARC_INST_MSG_SH );
+
 
   reg steering_mux_sel;
   reg steer_stall;
@@ -666,11 +682,13 @@ module parc_CoreCtrl
   *
   */
 
+  localparam op_alu     = 2'd0;
+  localparam op_mem     = 2'd1;
+  localparam op_muldiv  = 2'd2;
 
 
-  reg [4:0] scoreboard  [31:0];
+  reg [7:0] scoreboard  [31:0];
   integer i;
-  integer j;
 
   always @ ( posedge clk ) begin
     if ( reset ) begin
@@ -680,7 +698,22 @@ module parc_CoreCtrl
       for ( i=0; i<32; i=i+1 ) begin
         // initial step
         if ( !stall_X0hl && 
-             (rfA_wen_Dhl && instA_rd_Dhl != 5'b0 && i == instA_rd_Dhl)) begin
+           ( rfA_wen_Dhl && instA_rd_Dhl != 5'b0 && i == instA_rd_Dhl)) 
+        begin
+
+          if ( is_load_Dhl ) begin
+            scoreboard[i][7:6] <= op_mem;
+            scoreboard[i][5]   <= 1;
+          end
+          else if ( is_A_muldiv ) begin
+            scoreboard[i][7:6] <= op_muldiv;
+            scoreboard[i][5]   <= 1;
+          end
+          else begin
+            scoreboard[i][7:6] <= op_alu;
+            scoreboard[i][5]   <= 0;
+          end
+
           scoreboard[i][0] <= 1;
         end
         else begin
@@ -690,6 +723,9 @@ module parc_CoreCtrl
         // update steps (haven't accounted for squashing?)
         if ( !stall_X1hl ) begin
           scoreboard[i][1] <= scoreboard[i][0];
+          if ( scoreboard[i][7:6] == op_mem) begin
+            scoreboard[i][5] <= 0;
+          end
         end
         else begin
           scoreboard[i][1] <= scoreboard[i][1];
@@ -702,6 +738,9 @@ module parc_CoreCtrl
         end
         if ( !stall_X3hl ) begin
           scoreboard[i][3] <= scoreboard[i][2];
+          if ( scoreboard[i][7:6] == op_muldiv) begin
+            scoreboard[i][5] <= 0;
+          end
         end
         else begin
           scoreboard[i][3] <= scoreboard[i][3];
@@ -721,6 +760,7 @@ module parc_CoreCtrl
   wire opA1_byp_mux_sel_Dhl_DEBUG = (opA1_byp_mux_sel_Dhl == old_opA1_byp_mux_sel_Dhl);
   wire [5:0] reg2_DEBUG = scoreboard[2];
   wire reg2_X2_DEBUG = scoreboard[instA_rs_Dhl][2];
+
 
   wire  [4:0] instA_rd_Dhl = rfA_waddr_Dhl;
   wire  [4:0] instA_rs_Dhl = ( steering_mux_sel == 1'b0 ) ? inst0_rs_Dhl : inst1_rs_Dhl;
@@ -1131,6 +1171,16 @@ module parc_CoreCtrl
       = ( steering_mux_sel == 1'b0 ) ? stall_0_Dhl
       : ( steering_mux_sel == 1'b1 ) ? stall_1_Dhl
       :                                1'bx;
+
+    wire my_stall_A_Dhl 
+      = stall_X0hl || inst_val_Dhl && (scoreboard[instA_rs_Dhl][5] || scoreboard[instA_rs_Dhl][5]);
+
+    wire [7:0] load_rs_DEBUG = scoreboard[instA_rs_Dhl];
+    wire [7:0] load_rt_DEBUG = scoreboard[instA_rt_Dhl];
+
+    
+
+    wire stall_A_Dhl_DEBUG = (my_stall_A_Dhl == my_stall_A_Dhl);
 
     // i'm not really sure why adding the additional condition to the steering stall
     // fixed some kind of data error, but it doesn't work properly without !brj_taken
