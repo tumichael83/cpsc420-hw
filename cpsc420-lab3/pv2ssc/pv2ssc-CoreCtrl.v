@@ -650,6 +650,87 @@ module parc_CoreCtrl
     end
   end
 
+  // SCOREBOARD
+
+  /*
+  * recall that we are not using superscalar at first
+  * we will always be issuing inst 0 then inst 1
+  *
+  *   Strategy: giant array of  10(?) bit registers
+  *     - which one to access? --> also a register!
+  *     - fields for the registers:
+  *       - operation type: ALU, muldiv, mem (2 bits)
+  *       - Busy / Pending (1 bit)
+  *       - Functional Unit A or B (1 bit)
+  *       - stage: X0, X1, X2, X3, W (5 bits, 1 hot encoding)
+  *
+  */
+
+
+
+  reg [4:0] scoreboard  [31:0];
+  integer i;
+
+  always @ ( posedge clk ) begin
+    if ( reset ) begin
+      for (i = 0; i < 32; i = i + 1) scoreboard[i] <= 'b0;
+    end
+    else begin
+      for ( i=0; i<32; i=i+1 ) begin
+        if ( !stall_X0hl && i == instA_rd_Dhl ) begin
+          scoreboard[i][0] <= 1;
+        end
+        else begin
+          scoreboard[i][0] <= 0;
+        end
+        if ( !stall_X1hl ) begin
+          scoreboard[i][1] <= scoreboard[i][0];
+        end
+        else begin
+          scoreboard[i][1] <= scoreboard[i][1];
+        end
+        if ( !stall_X2hl ) begin
+          scoreboard[i][2] <= scoreboard[i][1];
+        end
+        else begin
+          scoreboard[i][2] <= scoreboard[i][2];
+        end
+        if ( !stall_X3hl ) begin
+          scoreboard[i][3] <= scoreboard[i][2];
+        end
+        else begin
+          scoreboard[i][3] <= scoreboard[i][3];
+        end
+        if ( !stall_Whl ) begin
+          scoreboard[i][4] <= scoreboard[i][3];
+        end
+        else begin
+          scoreboard[i][4] <= scoreboard[i][4];
+        end
+      end
+    end
+  end
+
+  wire  [4:0] instA_rd_Dhl = rfA_waddr_Dhl;
+  wire  [4:0] instA_rs_Dhl = ( steering_mux_sel == 1'b0 ) ? inst0_rs_Dhl : inst1_rs_Dhl;
+  wire  [4:0] instA_rt_Dhl = ( steering_mux_sel == 1'b0 ) ? inst0_rt_Dhl : inst1_rt_Dhl;
+
+  assign opA0_byp_mux_sel_Dhl
+    = ( scoreboard[instA_rs_Dhl][0] ) ? am_AX0_byp
+    : ( scoreboard[instA_rs_Dhl][1] ) ? am_AX1_byp
+    : ( scoreboard[instA_rs_Dhl][2] ) ? am_AX2_byp
+    : ( scoreboard[instA_rs_Dhl][3] ) ? am_AX3_byp
+    : ( scoreboard[instA_rs_Dhl][4] ) ? am_AW_byp 
+    :                                   am_r0;
+
+  assign opA1_byp_mux_sel_Dhl
+    = ( scoreboard[instA_rt_Dhl][0] ) ? bm_AX0_byp
+    : ( scoreboard[instA_rt_Dhl][1] ) ? bm_AX1_byp
+    : ( scoreboard[instA_rt_Dhl][2] ) ? bm_AX2_byp
+    : ( scoreboard[instA_rt_Dhl][3] ) ? bm_AX3_byp
+    : ( scoreboard[instA_rt_Dhl][4] ) ? bm_AW_byp 
+    :                                   bm_r1;
+
   // ship instruction for field parsing to datapath
 
     assign instA_Dhl = irA_Dhl;
@@ -834,11 +915,11 @@ module parc_CoreCtrl
       : (rt1_AW_byp_Dhl)  ? bm_AW_byp
       :                     bm_r1;
 
-    assign opA0_byp_mux_sel_Dhl 
+    wire [3:0] old_opA0_byp_mux_sel_Dhl 
       = ( steering_mux_sel == 0 ) ? op00_byp_mux_sel_Dhl
       :                             op10_byp_mux_sel_Dhl;
 
-    assign opA1_byp_mux_sel_Dhl 
+    wire [3:0] old_opA1_byp_mux_sel_Dhl 
       = ( steering_mux_sel == 0 ) ? op01_byp_mux_sel_Dhl
       :                             op11_byp_mux_sel_Dhl;
 
