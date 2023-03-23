@@ -584,53 +584,50 @@ module parc_CoreCtrl
 
     | inst 0 type | inst 1 type | inst 0 dest | inst 1 dest |
     =========================================================
-    |     ALU     |     ALU     |      B      |      A      |
+    |     ALU     |     ALU     |      A      |      B      |
     |   n-ALU     |     ALU     |      A      |      B      |
     |     ALU     |   n-ALU     |      B      |      A      |
     |   n-ALU     |   n-ALU     |      A      |stall, then A|
 
     non-alu: muldiv, memory, jump, branch, mtc0
   */
-  wire is_0_alu
+
+  wire op0_is_alu
     =   !cs0[`PARC_INST_MSG_MULDIV_EN]
     &&  (cs0[`PARC_INST_MSG_MEM_REQ] == nr)
     &&  !cs0[`PARC_INST_MSG_J_EN]
     &&  (cs0[`PARC_INST_MSG_BR_SEL] == br_none)
     &&  !cs0[`PARC_INST_MSG_CP0_WEN];
 
-  reg steering_mux_sel;
+  wire op1_is_alu
+    =   !cs1[`PARC_INST_MSG_MULDIV_EN]
+    &&  (cs1[`PARC_INST_MSG_MEM_REQ] == nr)
+    &&  !cs1[`PARC_INST_MSG_J_EN]
+    &&  (cs1[`PARC_INST_MSG_BR_SEL] == br_none)
+    &&  !cs1[`PARC_INST_MSG_CP0_WEN];
+
+  // inst 1 depending on inst 0 triggers stall
+  // (note inst 0 can't depend on inst 1)
+  // does this need inst_val check??
+  wire op0_op1_RAW_Dhl
+    = rf0_wen_Dhl && ((rs1_en_Dhl && ( rf0_waddr_Dhl == rs1_addr_Dhl )) 
+                  ||  (rt1_en_Dhl && ( rf0_waddr_Dhl == rt1_addr_Dhl )));
+
+  // both writing to same register triggers stall
+  // for instruction 1
+  // does this need inst_val_check??
+  wire op0_op1_WAW_Dhl
+    = rf0_wen_Dhl && rf1_wen_Dhl && ( rf0_waddr_Dhl == rf1_waddr_Dhl );
+
+  localparam op0    = 2'd0;
+  localparam op1    = 2'd1;
+  localparam stall  = 2'd2;
+
+  reg pipe_A_mux_sel;
+  reg pipe_B_mux_sel;
   reg steer_stall;
 
-  wire stall_non_steer 
-    = (steering_mux_sel == 1'b0 && stall_0_Dhl) 
-    ||(steering_mux_sel == 1'b1 && (stall_1_Dhl || brj_taken_X0hl || brj_taken_Dhl));
-  
-  always @( posedge clk )
-  begin
-    if ( reset ) begin
-      steering_mux_sel <= 1'b1;
-    end
-    else begin
-      // idk how these conditions work
-      if ( stall_non_steer ) begin
-        steering_mux_sel <= steering_mux_sel;
-
-        if (steering_mux_sel == 1'b0) begin
-          steer_stall <= 1'b0;
-        end
-      end
-      else begin
-        steering_mux_sel <= ~steering_mux_sel;
-
-        if (steering_mux_sel == 1'b0) begin
-          steer_stall <= 1'b0;
-        end
-        else begin
-          steer_stall <= 1'b1;
-        end
-      end
-    end
-  end
+  wire new_stall_non_steer_Dhl;
 
   reg [cs_sz-1:0] csA;        // instruction decode signals
   reg [cs_sz-1:0] csB;
@@ -638,25 +635,94 @@ module parc_CoreCtrl
   reg [31:0] irA_Dhl;         // raw instruction
   reg [31:0] irB_Dhl;
 
-  always @(*)
-  begin
-    if ( steering_mux_sel == 1'b0 )
-    begin
-      csA = cs0;
-      csB = {cs_sz{1'bx}};
-
-      irA_Dhl = ir0_Dhl;
-      irB_Dhl = `PARC_INST_MSG_NOP;
+  always @ ( posedge clk ) begin
+    if ( reset ) begin
+      pipe_A_mux_sel <= stall;
+      pipe_B_mux_sel <= stall;
+      steer_stall    <= 1'b0;
     end
-    else if ( steering_mux_sel == 1'b1 )
-    begin
-      csA = cs1;
-      csB = {cs_sz{1'bx}};
-
-      irA_Dhl = ir1_Dhl;
-      irB_Dhl = `PARC_INST_MSG_NOP;
+    else begin
+      if ( new_stall_non_steer_Dhl ) begin
+        pipe_A_mux_sel <= pipe_A_mux_sel;
+        pipe_B_mux_sel <= pipe_B_mux_sel;
+        steer_stall    <= steer_stall;
+      end
+      else begin
+        if ( op0_is_alu && op1_is_alu ) begin
+          pipe_A_mux_sel <= op0;
+          pipe_B_mux_sel <= op1;
+          steer_stall    <= 1'b0;
+        end
+        else if ( !op0_is_alu && op1_is_alu ) begin
+          pipe_A_mux_sel <= op0;
+          pipe_B_mux_sel <= op1;
+          steer_stall    <= 1'b0;
+        end
+        else if ( op0_is_alu && !op1_is_alu ) begin
+          pipe_A_mux_sel <= op1;
+          pipe_B_mux_sel <= op0;
+          steer_stall    <= 1'b0;
+        end
+        else if ( !op0_is_alu && !op1_is_alu ) begin
+          if ( steer_stall == 1'b0 ) begin
+            pipe_A_mux_sel <= op0;
+            pipe_B_mux_sel <= stall;
+            steer_stall    <= 1'b1;
+          end
+          else begin
+            pipe_A_mux_sel <= op1;
+            pipe_B_mux_sel <= stall;
+            steer_stall    <= 1'b0;
+          end
+        end
+      end
     end
   end
+
+
+
+  // Old, single-pipeline steering logic
+    reg steering_mux_sel;
+
+    wire stall_non_steer 
+      = (steering_mux_sel == 1'b0 && stall_0_Dhl) 
+      ||(steering_mux_sel == 1'b1 && (stall_1_Dhl || brj_taken_X0hl || brj_taken_Dhl));
+    
+    always @( posedge clk )
+    begin
+      if ( reset ) begin
+        steering_mux_sel <= 1'b1;
+      end
+      else begin
+        // idk how these conditions work
+        if ( stall_non_steer ) begin
+          steering_mux_sel <= steering_mux_sel;
+        end
+        else begin
+          steering_mux_sel <= ~steering_mux_sel;
+        end
+      end
+    end
+
+    always @(*)
+    begin
+      if ( steering_mux_sel == 1'b0 )
+      begin
+        csA = cs0;
+        csB = {cs_sz{1'bx}};
+
+        irA_Dhl = ir0_Dhl;
+        irB_Dhl = `PARC_INST_MSG_NOP;
+      end
+      else if ( steering_mux_sel == 1'b1 )
+      begin
+        csA = cs1;
+        csB = {cs_sz{1'bx}};
+
+        irA_Dhl = ir1_Dhl;
+        irB_Dhl = `PARC_INST_MSG_NOP;
+      end
+    end
 
   // SCOREBOARD
 
@@ -1054,6 +1120,9 @@ module parc_CoreCtrl
 
     wire rf0_wen_Dhl         = cs0[`PARC_INST_MSG_RF_WEN];
     wire [4:0] rf0_waddr_Dhl = cs0[`PARC_INST_MSG_RF_WADDR];
+
+    wire rf1_wen_Dhl         = cs1[`PARC_INST_MSG_RF_WEN];
+    wire [4:0] rf1_waddr_Dhl = cs1[`PARC_INST_MSG_RF_WADDR];
 
     wire rfA_wen_Dhl         = csA[`PARC_INST_MSG_RF_WEN];
     wire [4:0] rfA_waddr_Dhl = csA[`PARC_INST_MSG_RF_WADDR];
