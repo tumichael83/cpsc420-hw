@@ -623,11 +623,10 @@ module parc_CoreCtrl
   localparam op1    = 2'd1;
   localparam stall  = 2'd2;
 
-  reg pipe_A_mux_sel;
-  reg pipe_B_mux_sel;
-  reg steer_stall;
+  reg [1:0] pipe_A_mux_sel;
+  reg [1:0] pipe_B_mux_sel;
 
-  wire new_stall_non_steer_Dhl;
+  wire new_stall_non_steer_Dhl = 0;
 
   reg [cs_sz-1:0] csA;        // instruction decode signals
   reg [cs_sz-1:0] csB;
@@ -637,49 +636,48 @@ module parc_CoreCtrl
 
   wire steering_mux_sel;
 
+  reg stall_hazard;
+
   always @( posedge clk ) begin
     if ( reset ) begin
-      pipe_A_mux_sel <= stall;
-      pipe_B_mux_sel <= stall;
-      steer_stall    <= 1'b0;
+      stall_hazard <= 0;
     end
     else begin
+      stall_hazard <= ~stall_hazard;
+    end
+  end
+
+  always @( * ) begin
       if ( new_stall_non_steer_Dhl ) begin
         pipe_A_mux_sel <= pipe_A_mux_sel;
         pipe_B_mux_sel <= pipe_B_mux_sel;
-        steer_stall    <= steer_stall;
       end
       else begin
         if ( op0_is_alu && op1_is_alu ) begin
           pipe_A_mux_sel <= op0;
           pipe_B_mux_sel <= op1;
-          steer_stall    <= 1'b0;
         end
         else if ( !op0_is_alu && op1_is_alu ) begin
           pipe_A_mux_sel <= op0;
           pipe_B_mux_sel <= op1;
-          steer_stall    <= 1'b0;
         end
         else if ( op0_is_alu && !op1_is_alu ) begin
           pipe_A_mux_sel <= op1;
           pipe_B_mux_sel <= op0;
-          steer_stall    <= 1'b0;
         end
         else if ( !op0_is_alu && !op1_is_alu ) begin
-          if ( steer_stall == 1'b0 ) begin
+          if ( stall_hazard == 1'b0 ) begin
             pipe_A_mux_sel <= op0;
             pipe_B_mux_sel <= stall;
-            steer_stall    <= 1'b1;
           end
           else begin
             pipe_A_mux_sel <= op1;
             pipe_B_mux_sel <= stall;
-            steer_stall    <= 1'b0;
           end
         end
       end
     end
-  end
+
 
   always @( * ) begin
     if ( pipe_A_mux_sel == op0 ) begin
@@ -1279,12 +1277,11 @@ module parc_CoreCtrl
       = inst_val_Dhl && 
         ((rsB_en_Dhl && scoreboard[instB_rs_Dhl][5]) || (rtB_en_Dhl && scoreboard[instB_rt_Dhl][5]));
 
-    // I'm pretty sure we're not stalling properly for muldiv instructions
-    wire stall_Dhl = stall_A_Dhl || stall_B_Dhl;
+    wire stall_Dhl = stall_A_Dhl || stall_B_Dhl || (inst_val_Dhl && (op0_op1_RAW_Dhl));
 
     // Next bubble bit
 
-    wire bubble_sel_Dhl  = ( squash_Dhl || stall_A_Dhl ); // I'm also unsure whether this should be stall_0
+    wire bubble_sel_Dhl  = ( squash_Dhl || stall_A_Dhl || stall_B_Dhl ); // I'm also unsure whether this should be stall_0
     wire bubble_next_Dhl = ( !bubble_sel_Dhl ) ? bubble_Dhl
                          : ( bubble_sel_Dhl  ) ? 1'b1
                          :                       1'bx;
