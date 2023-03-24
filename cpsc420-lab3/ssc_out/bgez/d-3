@@ -1,0 +1,164 @@
+WARNING: ../pv2dualfetch/pv2dualfetch-sim.v:183: $readmemh: Standard inconsistency, following 1364-2005.
+VCD info: dumpfile ../tests/build/vmh/parcv2-bgez.vcd opened for output.
+/{ xxxxxxxx |        | -- |        |        |        |        |        }\
+\{ xxxxxxxx |        | -- |        |        |        |        |        }/
+/{ xxxxxxxx |        | -- |        |        |        |        |        }\
+\{ xxxxxxxx |        | -- |        |        |        |        |        }/
+/{ xxxxxxxx |        | -- |        |        |        |        |        }\
+\{ xxxxxxxx |        | -- |        |        |        |        |        }/
+/{ 00080000 |  (-_-) | \/ |  (-_-) |  (-_-) |  (-_-) |  (-_-) |  (-_-) }\
+\{ 00080004 |  (-_-) | /\ |  (-_-) |  (-_-) |  (-_-) |  (-_-) |  (-_-) }/
+/{ 00080000 |  (-_-) | \/ |  (-_-) |  (-_-) |  (-_-) |  (-_-) |  (-_-) }\
+\{ 00080004 |  (-_-) | /\ |  (-_-) |  (-_-) |  (-_-) |  (-_-) |  (-_-) }/
+/{#00080008 |# addiu | -- |  (-_-) |  (-_-) |  (-_-) |  (-_-) |  (-_-) }\
+\{#0008000c |# bgez  | -- |  (-_-) |  (-_-) |  (-_-) |  (-_-) |  (-_-) }/
+/{ 00080008 |  addiu | \/ |  addiu |  (-_-) |  (-_-) |  (-_-) |  (-_-) }\
+\{ 0008000c |  bgez  | /\ |  undef |  (-_-) |  (-_-) |  (-_-) |  (-_-) }/
+/{-00080010-|- addiu-| -- |  bgez  |  addiu |  (-_-) |  (-_-) |  (-_-) }\
+\{-00080014-|- bne  -| -- |  undef |  undef |  (-_-) |  (-_-) |  (-_-) }/
+/{ 00080018 |  (-_-) | \/ |  (-_-) |  bgez  |  addiu |  (-_-) |  (-_-) }\
+\{ 0008001c |  (-_-) | /\ |  (-_-) |  undef |  undef |  (-_-) |  (-_-) }/
+/{#00080020 |# bgez  | -- |  (-_-) |  (-_-) |  bgez  |  addiu |  (-_-) }\
+\{#00080024 |# addiu | -- |  (-_-) |  (-_-) |  undef |  undef |  (-_-) }/
+/{-00080020-|- bgez -| \/ |  bgez  |  (-_-) |  (-_-) |  bgez  |  addiu }\
+\{-00080024-|- addiu-| /\ |  undef |  (-_-) |  (-_-) |  undef |  undef }/
+/{ 00080010 |  (-_-) | \/ |  (-_-) |  bgez  |  (-_-) |  (-_-) |  bgez  }\
+\{ 00080014 |  (-_-) | /\ |  (-_-) |  undef |  (-_-) |  (-_-) |  undef }/
+/{#00080018 |# addiu | -- |  (-_-) |  (-_-) |  bgez  |  (-_-) |  (-_-) }\
+\{#0008001c |# bne   | -- |  (-_-) |  (-_-) |  undef |  (-_-) |  (-_-) }/
+/{ 00080018 |  addiu | \/ |  addiu |  (-_-) |  (-_-) |  bgez  |  (-_-) }\
+\{ 0008001c |  bne   | /\ |  undef |  (-_-) |  (-_-) |  undef |  (-_-) }/
+/{-00080020-|- bgez -| -- |  bne   |  addiu |  (-_-) |  (-_-) |  bgez  }\
+\{-00080024-|- addiu-| -- |  undef |  undef |  (-_-) |  (-_-) |  undef }/
+/{ 00080024 |  (-_-) | \/ |  (-_-) |  bne   |  addiu |  (-_-) |  (-_-) }\
+\{ 00080028 |  (-_-) | /\ |  (-_-) |  undef |  undef |  (-_-) |  (-_-) }/
+/{#0008002c |# addiu | -- |  (-_-) |  (-_-) |  bne   |  addiu |  (-_-) }\
+\{#00080030 |# bgez  | -- |  (-_-) |  (-_-) |  undef |  undef |  (-_-) }/
+/{ 0008002c |  addiu | \/ |  addiu |  (-_-) |  (-_-) |  bne   |  addiu }\
+\{ 00080030 |  bgez  | /\ |  undef |  (-_-) |  (-_-) |  undef |  undef }/
+/{-00080034-|- addiu-| -- |  bgez  |  addiu |  (-_-) |  (-_-) |  bne   }\
+\{-00080038-|- bne  -| -- |  undef |  undef |  (-_-) |  (-_-) |  undef }/
+/{ 0008003c |  (-_-) | \/ |  (-_-) |  bgez  |  addiu |  (-_-) |  (-_-) }\
+\{ 00080040 |  (-_-) | /\ |  (-_-) |  undef |  undef |  (-_-) |  (-_-) }/
+/{#00080044 |# bgez  | -- |  (-_-) |  (-_-) |  bgez  |  addiu |  (-_-) }\
+\{#00080048 |# addiu | -- |  (-_-) |  (-_-) |  undef |  undef |  (-_-) }/
+/{-00080044-|- bgez -| \/ |  bgez  |  (-_-) |  (-_-) |  bgez  |  addiu }\
+\{-00080048-|- addiu-| /\ |  undef |  (-_-) |  (-_-) |  undef |  undef }/
+/{ 00080034 |  (-_-) | \/ |  (-_-) |  bgez  |  (-_-) |  (-_-) |  bgez  }\
+\{ 00080038 |  (-_-) | /\ |  (-_-) |  undef |  (-_-) |  (-_-) |  undef }/
+/{#0008003c |# addiu | -- |  (-_-) |  (-_-) |  bgez  |  (-_-) |  (-_-) }\
+\{#00080040 |# bne   | -- |  (-_-) |  (-_-) |  undef |  (-_-) |  (-_-) }/
+/{ 0008003c |  addiu | \/ |  addiu |  (-_-) |  (-_-) |  bgez  |  (-_-) }\
+\{ 00080040 |  bne   | /\ |  undef |  (-_-) |  (-_-) |  undef |  (-_-) }/
+/{-00080044-|- bgez -| -- |  bne   |  addiu |  (-_-) |  (-_-) |  bgez  }\
+\{-00080048-|- addiu-| -- |  undef |  undef |  (-_-) |  (-_-) |  undef }/
+/{ 00080048 |  (-_-) | \/ |  (-_-) |  bne   |  addiu |  (-_-) |  (-_-) }\
+\{ 0008004c |  (-_-) | /\ |  (-_-) |  undef |  undef |  (-_-) |  (-_-) }/
+/{#00080050 |# addiu | -- |  (-_-) |  (-_-) |  bne   |  addiu |  (-_-) }\
+\{#00080054 |# bgez  | -- |  (-_-) |  (-_-) |  undef |  undef |  (-_-) }/
+/{ 00080050 |  addiu | \/ |  addiu |  (-_-) |  (-_-) |  bne   |  addiu }\
+\{ 00080054 |  bgez  | /\ |  undef |  (-_-) |  (-_-) |  undef |  undef }/
+/{#00080058 |# addiu | -- |  bgez  |  addiu |  (-_-) |  (-_-) |  bne   }\
+\{#0008005c |# bne   | -- |  undef |  undef |  (-_-) |  (-_-) |  undef }/
+/{ 00080058 |  addiu | \/ |  addiu |  bgez  |  addiu |  (-_-) |  (-_-) }\
+\{ 0008005c |  bne   | /\ |  undef |  undef |  undef |  (-_-) |  (-_-) }/
+/{-00080060-|- addiu-| -- |  bne   |  addiu |  bgez  |  addiu |  (-_-) }\
+\{-00080064-|- bne  -| -- |  undef |  undef |  undef |  undef |  (-_-) }/
+/{ 00080060 |  (-_-) | \/ |  (-_-) |  bne   |  addiu |  bgez  |  addiu }\
+\{ 00080064 |  (-_-) | /\ |  (-_-) |  undef |  undef |  undef |  undef }/
+/{#00080068 |# bgez  | -- |  (-_-) |  (-_-) |  bne   |  addiu |  bgez  }\
+\{#0008006c |# addiu | -- |  (-_-) |  (-_-) |  undef |  undef |  undef }/
+/{ 00080068 |  bgez  | \/ |  bgez  |  (-_-) |  (-_-) |  bne   |  addiu }\
+\{ 0008006c |  addiu | /\ |  undef |  (-_-) |  (-_-) |  undef |  undef }/
+/{#00080070 |# bgez  | -- |  addiu |  bgez  |  (-_-) |  (-_-) |  bne   }\
+\{#00080074 |# addiu | -- |  undef |  undef |  (-_-) |  (-_-) |  undef }/
+/{ 00080070 |  bgez  | \/ |  bgez  |  addiu |  bgez  |  (-_-) |  (-_-) }\
+\{ 00080074 |  addiu | /\ |  undef |  undef |  undef |  (-_-) |  (-_-) }/
+/{#00080078 |# bne   | -- |  addiu |  bgez  |  addiu |  bgez  |  (-_-) }\
+\{#0008007c |# addiu | -- |  undef |  undef |  undef |  undef |  (-_-) }/
+/{-00080078-|- bne  -| \/ |  bne   |  addiu |  bgez  |  addiu |  bgez  }\
+\{-0008007c-|- addiu-| /\ |  undef |  undef |  undef |  undef |  undef }/
+/{ 0008007c |  (-_-) | \/ |  (-_-) |  bne   |  addiu |  bgez  |  addiu }\
+\{ 00080080 |  (-_-) | /\ |  (-_-) |  undef |  undef |  undef |  undef }/
+/{#00080084 |# bgez  | -- |  (-_-) |  (-_-) |  bne   |  addiu |  bgez  }\
+\{#00080088 |# addiu | -- |  (-_-) |  (-_-) |  undef |  undef |  undef }/
+/{ 00080084 |  bgez  | \/ |  bgez  |  (-_-) |  (-_-) |  bne   |  addiu }\
+\{ 00080088 |  addiu | /\ |  undef |  (-_-) |  (-_-) |  undef |  undef }/
+/{#0008008c |# bgez  | -- |  addiu |  bgez  |  (-_-) |  (-_-) |  bne   }\
+\{#00080090 |# addiu | -- |  undef |  undef |  (-_-) |  (-_-) |  undef }/
+/{ 0008008c |  bgez  | \/ |  bgez  |  addiu |  bgez  |  (-_-) |  (-_-) }\
+\{ 00080090 |  addiu | /\ |  undef |  undef |  undef |  (-_-) |  (-_-) }/
+/{#00080094 |# bne   | -- |  addiu |  bgez  |  addiu |  bgez  |  (-_-) }\
+\{#00080098 |# addiu | -- |  undef |  undef |  undef |  undef |  (-_-) }/
+/{-00080094-|- bne  -| \/ |  bne   |  addiu |  bgez  |  addiu |  bgez  }\
+\{-00080098-|- addiu-| /\ |  undef |  undef |  undef |  undef |  undef }/
+/{ 00080098 |  (-_-) | \/ |  (-_-) |  bne   |  addiu |  bgez  |  addiu }\
+\{ 0008009c |  (-_-) | /\ |  (-_-) |  undef |  undef |  undef |  undef }/
+/{#000800a0 |# addiu | -- |  (-_-) |  (-_-) |  bne   |  addiu |  bgez  }\
+\{#000800a4 |# nop   | -- |  (-_-) |  (-_-) |  undef |  undef |  undef }/
+/{ 000800a0 |  addiu | \/ |  addiu |  (-_-) |  (-_-) |  bne   |  addiu }\
+\{ 000800a4 |  nop   | /\ |  undef |  (-_-) |  (-_-) |  undef |  undef }/
+/{#000800a8 |# bgez  | -- |  nop   |  addiu |  (-_-) |  (-_-) |  bne   }\
+\{#000800ac |# addiu | -- |  undef |  undef |  (-_-) |  (-_-) |  undef }/
+/{ 000800a8 |  bgez  | \/ |  bgez  |  nop   |  addiu |  (-_-) |  (-_-) }\
+\{ 000800ac |  addiu | /\ |  undef |  undef |  undef |  (-_-) |  (-_-) }/
+/{#000800b0 |# bne   | -- |  addiu |  bgez  |  nop   |  addiu |  (-_-) }\
+\{#000800b4 |# addiu | -- |  undef |  undef |  undef |  undef |  (-_-) }/
+/{-000800b0-|- bne  -| \/ |  bne   |  addiu |  bgez  |  nop   |  addiu }\
+\{-000800b4-|- addiu-| /\ |  undef |  undef |  undef |  undef |  undef }/
+/{ 000800b4 |  (-_-) | \/ |  (-_-) |  bne   |  addiu |  bgez  |  nop   }\
+\{ 000800b8 |  (-_-) | /\ |  (-_-) |  undef |  undef |  undef |  undef }/
+/{#000800bc |# addiu | -- |  (-_-) |  (-_-) |  bne   |  addiu |  bgez  }\
+\{#000800c0 |# nop   | -- |  (-_-) |  (-_-) |  undef |  undef |  undef }/
+/{ 000800bc |  addiu | \/ |  addiu |  (-_-) |  (-_-) |  bne   |  addiu }\
+\{ 000800c0 |  nop   | /\ |  undef |  (-_-) |  (-_-) |  undef |  undef }/
+/{#000800c4 |# nop   | -- |  nop   |  addiu |  (-_-) |  (-_-) |  bne   }\
+\{#000800c8 |# bgez  | -- |  undef |  undef |  (-_-) |  (-_-) |  undef }/
+/{ 000800c4 |  nop   | \/ |  nop   |  nop   |  addiu |  (-_-) |  (-_-) }\
+\{ 000800c8 |  bgez  | /\ |  undef |  undef |  undef |  (-_-) |  (-_-) }/
+/{#000800cc |# addiu | -- |  bgez  |  nop   |  nop   |  addiu |  (-_-) }\
+\{#000800d0 |# bne   | -- |  undef |  undef |  undef |  undef |  (-_-) }/
+/{ 000800cc |  addiu | \/ |  addiu |  bgez  |  nop   |  nop   |  addiu }\
+\{ 000800d0 |  bne   | /\ |  undef |  undef |  undef |  undef |  undef }/
+/{-000800d4-|- addiu-| -- |  bne   |  addiu |  bgez  |  nop   |  nop   }\
+\{-000800d8-|- bne  -| -- |  undef |  undef |  undef |  undef |  undef }/
+/{ 000800d4 |  (-_-) | \/ |  (-_-) |  bne   |  addiu |  bgez  |  nop   }\
+\{ 000800d8 |  (-_-) | /\ |  (-_-) |  undef |  undef |  undef |  undef }/
+/{#000800dc |# addiu | -- |  (-_-) |  (-_-) |  bne   |  addiu |  bgez  }\
+\{#000800e0 |# bgez  | -- |  (-_-) |  (-_-) |  undef |  undef |  undef }/
+/{ 000800dc |  addiu | \/ |  addiu |  (-_-) |  (-_-) |  bne   |  addiu }\
+\{ 000800e0 |  bgez  | /\ |  undef |  (-_-) |  (-_-) |  undef |  undef }/
+/{-000800e4-|- addiu-| -- |  bgez  |  addiu |  (-_-) |  (-_-) |  bne   }\
+\{-000800e8-|- addiu-| -- |  undef |  undef |  (-_-) |  (-_-) |  undef }/
+/{ 000800ec |  (-_-) | \/ |  (-_-) |  bgez  |  addiu |  (-_-) |  (-_-) }\
+\{ 000800f0 |  (-_-) | /\ |  (-_-) |  undef |  undef |  (-_-) |  (-_-) }/
+/{#000800f4 |# addiu | -- |  (-_-) |  (-_-) |  bgez  |  addiu |  (-_-) }\
+\{#000800f8 |# addiu | -- |  (-_-) |  (-_-) |  undef |  undef |  (-_-) }/
+/{ 000800f4 |  addiu | \/ |  addiu |  (-_-) |  (-_-) |  bgez  |  addiu }\
+\{ 000800f8 |  addiu | /\ |  undef |  (-_-) |  (-_-) |  undef |  undef }/
+/{#000800fc |# addiu | -- |  addiu |  addiu |  (-_-) |  (-_-) |  bgez  }\
+\{#00080100 |# addiu | -- |  undef |  undef |  (-_-) |  (-_-) |  undef }/
+/{ 000800fc |  addiu | \/ |  addiu |  addiu |  addiu |  (-_-) |  (-_-) }\
+\{ 00080100 |  addiu | /\ |  undef |  undef |  undef |  (-_-) |  (-_-) }/
+/{#00080104 |# bne   | -- |  addiu |  addiu |  addiu |  addiu |  (-_-) }\
+\{#00080108 |# addiu | -- |  undef |  undef |  undef |  undef |  (-_-) }/
+/{ 00080104 |  bne   | \/ |  bne   |  addiu |  addiu |  addiu |  addiu }\
+\{ 00080108 |  addiu | /\ |  undef |  undef |  undef |  undef |  undef }/
+/{#0008010c |# addiu | -- |  addiu |  bne   |  addiu |  addiu |  addiu }\
+\{#00080110 |# mtc0  | -- |  undef |  undef |  undef |  undef |  undef }/
+/{ 0008010c |  addiu | \/ |  addiu |  addiu |  bne   |  addiu |  addiu }\
+\{ 00080110 |  mtc0  | /\ |  undef |  undef |  undef |  undef |  undef }/
+/{#00080114 |# bne   | -- |  mtc0  |  addiu |  addiu |  bne   |  addiu }\
+\{#00080118 |# nop   | -- |  undef |  undef |  undef |  undef |  undef }/
+/{-00080114-|- bne  -| \/ |  bne   |  mtc0  |  addiu |  addiu |  bne   }\
+\{-00080118-|- nop  -| /\ |  undef |  undef |  undef |  undef |  undef }/
+/{ 0008010c |  (-_-) | \/ |  (-_-) |  bne   |  mtc0  |  addiu |  addiu }\
+\{ 00080110 |  (-_-) | /\ |  (-_-) |  undef |  undef |  undef |  undef }/
+/{#00080114 |# bne   | -- |  (-_-) |  (-_-) |  bne   |  mtc0  |  addiu }\
+\{#00080118 |# nop   | -- |  (-_-) |  (-_-) |  undef |  undef |  undef }/
+/{-00080114-|- bne  -| \/ |  bne   |  (-_-) |  (-_-) |  bne   |  mtc0  }\
+\{-00080118-|- nop  -| /\ |  undef |  (-_-) |  (-_-) |  undef |  undef }/
+*** PASSED ***
+/{ 0008010c |  (-_-) | \/ |  (-_-) |  bne   |  (-_-) |  (-_-) |  bne   }\
+\{ 00080110 |  (-_-) | /\ |  (-_-) |  undef |  (-_-) |  (-_-) |  undef }/
+/{#00080114 |
