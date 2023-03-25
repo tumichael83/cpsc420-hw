@@ -594,14 +594,16 @@ module parc_CoreCtrl
   */
 
   wire op0_is_alu
-    =   !cs0[`PARC_INST_MSG_MULDIV_EN]
+    =   inst_val_Dhl
+    &&  !cs0[`PARC_INST_MSG_MULDIV_EN]
     &&  (cs0[`PARC_INST_MSG_MEM_REQ] == nr)
     &&  !cs0[`PARC_INST_MSG_J_EN]
     &&  (cs0[`PARC_INST_MSG_BR_SEL] == br_none)
     &&  !cs0[`PARC_INST_MSG_CP0_WEN];
 
   wire op1_is_alu
-    =   !cs1[`PARC_INST_MSG_MULDIV_EN]
+    =   inst_val_Dhl
+    &&  !cs1[`PARC_INST_MSG_MULDIV_EN]
     &&  (cs1[`PARC_INST_MSG_MEM_REQ] == nr)
     &&  !cs1[`PARC_INST_MSG_J_EN]
     &&  (cs1[`PARC_INST_MSG_BR_SEL] == br_none)
@@ -645,9 +647,10 @@ module parc_CoreCtrl
 
   reg stall_steer;
   wire internal_hazard_Dhl 
-    = op0_op1_RAW_Dhl 
+    = !cs0[`PARC_INST_MSG_J_EN] &&
+    ( op0_op1_RAW_Dhl 
     || op0_op1_WAW_Dhl 
-    || ( !op0_is_alu && !op1_is_alu );
+    || ( !op0_is_alu && !op1_is_alu ));
 
   wire jump_hazard_Dhl = cs0[`PARC_INST_MSG_J_EN] || cs1[`PARC_INST_MSG_J_EN];
 
@@ -664,7 +667,7 @@ module parc_CoreCtrl
       if ( stall_non_steer ) begin
         stall_steer <= stall_steer;
       end
-      else if ( internal_hazard_Dhl && stall_steer && !brj_taken_X0hl) begin
+      else if ( inst_val_Dhl && internal_hazard_Dhl && stall_steer && !brj_taken_X0hl) begin
         stall_steer <= 0;
       end
       else begin
@@ -673,32 +676,37 @@ module parc_CoreCtrl
     end
   end
 
-  reg ctrl_debug;
+  reg [3:0] ctrl_debug;
 
   always @( * ) begin
-    ctrl_debug = 0;
+    ctrl_debug = 4'd0;
     if (internal_hazard_Dhl) begin
       if (stall_steer == 1) begin
         pipe_A_mux_sel <= op0;
         pipe_B_mux_sel <= stall;
+        ctrl_debug = 5;
       end
       else if (stall_steer == 0) begin
         pipe_A_mux_sel <= op1;
         pipe_B_mux_sel <= stall;
+        ctrl_debug = 4;
       end
     end
     else begin
       if ( op0_is_alu && op1_is_alu ) begin
         pipe_A_mux_sel <= op0;
         pipe_B_mux_sel <= op1;
+        ctrl_debug = 3;
       end
       else if ( !op0_is_alu && op1_is_alu ) begin
         pipe_A_mux_sel <= op0;
         pipe_B_mux_sel <= op1;
+        ctrl_debug = 1;
       end
       else if ( op0_is_alu && !op1_is_alu ) begin
         pipe_A_mux_sel <= op1;
         pipe_B_mux_sel <= op0;
+        ctrl_debug = 2;
       end
     end
   end
@@ -1318,7 +1326,7 @@ module parc_CoreCtrl
 
     // Next bubble bit
 
-    wire bubble_sel_Dhl  = ( squash_Dhl || stall_A_Dhl || stall_B_Dhl ); // I'm also unsure whether this should be stall_0
+    wire bubble_sel_Dhl  = ( squash_Dhl || stall_A_Dhl || stall_B_Dhl );
     wire bubble_next_Dhl = ( !bubble_sel_Dhl ) ? bubble_Dhl
                          : ( bubble_sel_Dhl  ) ? 1'b1
                          :                       1'bx;
@@ -1890,8 +1898,8 @@ module parc_CoreCtrl
 
         // Count instructions for every cycle not squashed or stalled
 
-        if ( inst_val_Dhl && !stall_0_Dhl && !stall_1_Dhl ) begin
-          num_inst = num_inst + 1;
+        if ( inst_val_Dhl && !stall_A_Dhl && !stall_B_Dhl ) begin
+          num_inst = num_inst + 2;
         end
 
       end

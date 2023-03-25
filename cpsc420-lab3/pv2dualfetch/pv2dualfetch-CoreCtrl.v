@@ -962,29 +962,29 @@ module parc_CoreCtrl
                               ( inst_val_X0hl && rs0_en_Dhl && rfA_wen_X0hl
                                 && ( rs0_addr_Dhl == rfA_waddr_X0hl )
                                 && ( rfA_waddr_X0hl != 5'd0 ) && is_load_X0hl )
-                          || ( inst_val_X1hl && rs0_en_Dhl && rfA_wen_X1hl
-                                && ( rs0_addr_Dhl == rfA_waddr_X1hl )
-                                && ( rfA_waddr_X1hl != 5'd0 ) && is_load_X1hl )
+                          // || ( inst_val_X1hl && rs0_en_Dhl && rfA_wen_X1hl
+                          //       && ( rs0_addr_Dhl == rfA_waddr_X1hl )
+                          //       && ( rfA_waddr_X1hl != 5'd0 ) && is_load_X1hl )
                           || ( inst_val_X0hl && rt0_en_Dhl && rfA_wen_X0hl
                                 && ( rt0_addr_Dhl == rfA_waddr_X0hl )
-                                && ( rfA_waddr_X0hl != 5'd0 ) && is_load_X0hl )
-                          || ( inst_val_X1hl && rt0_en_Dhl && rfA_wen_X1hl
-                                && ( rt0_addr_Dhl == rfA_waddr_X1hl )
-                                && ( rfA_waddr_X1hl != 5'd0 ) && is_load_X1hl ) );
+                                && ( rfA_waddr_X0hl != 5'd0 ) && is_load_X0hl ));
+                          // || ( inst_val_X1hl && rt0_en_Dhl && rfA_wen_X1hl
+                          //       && ( rt0_addr_Dhl == rfA_waddr_X1hl )
+                          //       && ( rfA_waddr_X1hl != 5'd0 ) && is_load_X1hl ) );
 
     wire stall_1_load_use_Dhl = inst_val_Dhl && (
                               ( inst_val_X0hl && rs1_en_Dhl && rfA_wen_X0hl
                                 && ( rs1_addr_Dhl == rfA_waddr_X0hl )
                                 && ( rfA_waddr_X0hl != 5'd0 ) && is_load_X0hl )
-                          ||  ( inst_val_X1hl && rs1_en_Dhl && rfA_wen_X1hl
-                                && ( rs1_addr_Dhl == rfA_waddr_X1hl )
-                                && ( rfA_waddr_X1hl != 5'd0 ) && is_load_X1hl )
+                          // ||  ( inst_val_X1hl && rs1_en_Dhl && rfA_wen_X1hl
+                          //       && ( rs1_addr_Dhl == rfA_waddr_X1hl )
+                          //       && ( rfA_waddr_X1hl != 5'd0 ) && is_load_X1hl )
                           ||  ( inst_val_X0hl && rt1_en_Dhl && rfA_wen_X0hl
                                 && ( rt1_addr_Dhl == rfA_waddr_X0hl )
-                                && ( rfA_waddr_X0hl != 5'd0 ) && is_load_X0hl )
-                          ||  ( inst_val_X1hl && rt1_en_Dhl && rfA_wen_X1hl
-                                && ( rt1_addr_Dhl == rfA_waddr_X1hl )
-                                && ( rfA_waddr_X1hl != 5'd0 ) && is_load_X1hl ) );
+                                && ( rfA_waddr_X0hl != 5'd0 ) && is_load_X0hl ));
+                          // ||  ( inst_val_X1hl && rt1_en_Dhl && rfA_wen_X1hl
+                          //       && ( rt1_addr_Dhl == rfA_waddr_X1hl )
+                          //       && ( rfA_waddr_X1hl != 5'd0 ) && is_load_X1hl ) );
 
     // Aggregate Stall Signal --> split into stall_0, stall_1
 
