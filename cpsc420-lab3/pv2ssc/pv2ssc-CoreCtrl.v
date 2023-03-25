@@ -767,7 +767,7 @@ module parc_CoreCtrl
       else begin
         for ( i=0; i<32; i=i+1 ) begin
           // initial step
-            if ( !stall_X0hl && 
+            if ( inst_val_Dhl && !stall_X0hl && 
               ( rfA_wen_Dhl && instA_rd_Dhl != 5'b0 && i == instA_rd_Dhl)) // pipeline A
             begin
               debug_reg <= i;
@@ -789,7 +789,7 @@ module parc_CoreCtrl
 
               scoreboard[i][0] <= 1;
             end
-            else if ( !stall_X0hl && 
+            else if ( inst_val_Dhl && !stall_X0hl && 
               ( rfB_wen_Dhl && instB_rd_Dhl != 5'b0 && i == instB_rd_Dhl)) // pipeline B
             begin
               scoreboard[i][8] <= 1'b1;
@@ -928,7 +928,7 @@ module parc_CoreCtrl
     end
 
 
-  wire [8:0] temp3 = scoreboard[3];
+  wire [8:0] temp2 = scoreboard[2];
 
   // ship instruction for field parsing to datapath
 
