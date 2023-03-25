@@ -647,12 +647,12 @@ module parc_CoreCtrl
 
   reg stall_steer;
   wire internal_hazard_Dhl 
-    = !cs0[`PARC_INST_MSG_J_EN] &&
+    = !jump_hazard_Dhl &&
     ( op0_op1_RAW_Dhl 
     || op0_op1_WAW_Dhl 
     || ( !op0_is_alu && !op1_is_alu ));
 
-  wire jump_hazard_Dhl = cs0[`PARC_INST_MSG_J_EN] || cs1[`PARC_INST_MSG_J_EN];
+  wire jump_hazard_Dhl = cs0[`PARC_INST_MSG_J_EN];
 
   always @( posedge clk ) begin
     if ( reset ) begin
@@ -691,6 +691,10 @@ module parc_CoreCtrl
         pipe_B_mux_sel <= stall;
         ctrl_debug = 4;
       end
+    end
+    else if ( jump_hazard_Dhl ) begin
+        pipe_A_mux_sel <= op0;
+        pipe_B_mux_sel <= stall;
     end
     else begin
       if ( op0_is_alu && op1_is_alu ) begin
