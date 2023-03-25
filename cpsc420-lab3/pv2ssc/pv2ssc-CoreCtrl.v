@@ -103,10 +103,7 @@ module parc_CoreCtrl
 
   // PC offset (b/c we fetch 2 instructions at once)
   assign pc_offset_mux_sel_Dhl 
-    = (pipe_A_mux_sel == op0) ? 1
-    : (pipe_A_mux_sel == op1) ? 0
-    : (pipe_B_mux_sel == op0) ? 1
-    :                           0;
+    = (pipe_A_mux_sel == op1);
 
   // Only send a valid imem request if not stalled
 
@@ -612,16 +609,18 @@ module parc_CoreCtrl
 
   // inst 1 depending on inst 0 triggers stall
   // (note inst 0 can't depend on inst 1)
-  // does this need inst_val check??
+  // does this need inst_val check??  --> as it turns out yes
   wire op0_op1_RAW_Dhl
-    = rf0_wen_Dhl && ((rs1_en_Dhl && ( rf0_waddr_Dhl == rs1_addr_Dhl )) 
+    =   inst_val_Dhl
+    &&  rf0_wen_Dhl && ((rs1_en_Dhl && ( rf0_waddr_Dhl == rs1_addr_Dhl )) 
                   ||  (rt1_en_Dhl && ( rf0_waddr_Dhl == rt1_addr_Dhl )));
 
   // both writing to same register triggers stall
   // for instruction 1
-  // does this need inst_val_check??
+  // does this need inst_val_check??  --> as it turns out yes
   wire op0_op1_WAW_Dhl
-    = rf0_wen_Dhl && rf1_wen_Dhl && ( rf0_waddr_Dhl == rf1_waddr_Dhl );
+    =   inst_val_Dhl
+    &&  rf0_wen_Dhl && rf1_wen_Dhl && ( rf0_waddr_Dhl == rf1_waddr_Dhl );
 
   localparam op0    = 2'd0;
   localparam op1    = 2'd1;
@@ -641,19 +640,31 @@ module parc_CoreCtrl
 
   wire steering_mux_sel;
 
+  reg prev_pipe_A;
+  reg pc_offset_mux_reg_Dhl;
+
   reg stall_steer;
   wire internal_hazard_Dhl 
-    = op0_op1_RAW_Dhl || op0_op1_WAW_Dhl || ( !op0_is_alu && !op1_is_alu );
+    = op0_op1_RAW_Dhl 
+    || op0_op1_WAW_Dhl 
+    || ( !op0_is_alu && !op1_is_alu );
+
+  wire jump_hazard_Dhl = cs0[`PARC_INST_MSG_J_EN] || cs1[`PARC_INST_MSG_J_EN];
 
   always @( posedge clk ) begin
     if ( reset ) begin
       stall_steer <= 1;
+      pc_offset_mux_reg_Dhl <= 0;
+      prev_pipe_A <= pipe_A_mux_sel;
     end
     else begin
+      pc_offset_mux_reg_Dhl <= prev_pipe_A;
+      prev_pipe_A <= pipe_A_mux_sel;
+
       if ( stall_non_steer ) begin
         stall_steer <= stall_steer;
       end
-      else if ( internal_hazard_Dhl && stall_steer ) begin
+      else if ( internal_hazard_Dhl && stall_steer && !brj_taken_X0hl) begin
         stall_steer <= 0;
       end
       else begin
@@ -662,7 +673,10 @@ module parc_CoreCtrl
     end
   end
 
+  reg ctrl_debug;
+
   always @( * ) begin
+    ctrl_debug = 0;
     if (internal_hazard_Dhl) begin
       if (stall_steer == 1) begin
         pipe_A_mux_sel <= op0;
@@ -746,6 +760,7 @@ module parc_CoreCtrl
     integer i;
 
     always @ ( posedge clk ) begin
+      debug_reg = 0;
       if ( reset ) begin
         for (i = 0; i < 32; i = i + 1) scoreboard[i] <= 'b0;
       end
@@ -755,6 +770,7 @@ module parc_CoreCtrl
             if ( !stall_X0hl && 
               ( rfA_wen_Dhl && instA_rd_Dhl != 5'b0 && i == instA_rd_Dhl)) // pipeline A
             begin
+              debug_reg <= i;
 
               scoreboard[i][8] <= 1'b0;
 
@@ -819,6 +835,8 @@ module parc_CoreCtrl
         end
       end
     end
+
+    reg [5:0] debug_reg;
 
     wire  [4:0] instA_rd_Dhl = rfA_waddr_Dhl;
     wire  [4:0] instA_rs_Dhl = ( pipe_A_mux_sel == op0 ) ? inst0_rs_Dhl : inst1_rs_Dhl;
@@ -910,7 +928,7 @@ module parc_CoreCtrl
     end
 
 
-  wire [8:0] temp2 = scoreboard[4];
+  wire [8:0] temp3 = scoreboard[3];
 
   // ship instruction for field parsing to datapath
 
