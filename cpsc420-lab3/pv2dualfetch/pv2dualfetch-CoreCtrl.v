@@ -618,20 +618,163 @@ module parc_CoreCtrl
     if ( steering_mux_sel == 1'b0 )
     begin
       csA = cs0;
-      csB = {cs_sz{1'bx}};
+      csB = `PARC_INST_MSG_NOP;
 
       irA_Dhl = ir0_Dhl;
-      irB_Dhl = 31'bx;
+      irB_Dhl = 31'b0;
     end
     else if ( steering_mux_sel == 1'b1 )
     begin
       csA = cs1;
-      csB = {cs_sz{1'bx}};
+      csB = `PARC_INST_MSG_NOP;
 
       irA_Dhl = ir1_Dhl;
-      irB_Dhl = 31'bx;
+      irB_Dhl = 31'b0;
     end
   end
+
+  // SCOREBOARD
+
+    /*
+    * recall that we are not using superscalar at first
+    * we will always be issuing inst 0 then inst 1
+    *
+    *   Strategy: giant array of  10(?) bit registers
+    *     - which one to access? --> also a register!
+    *     - fields for the registers:
+    *       - Functional Unit A or B (1 bit)  --> bit 8
+    *       - operation type: ALU, muldiv, mem (2 bits) --> bits 7,6
+    *       - Busy / Pending (1 bit)  --> bit 5
+    *       - stage: X0, X1, X2, X3, W (5 bits, 1 hot encoding) --> bits 4-0
+    *
+    */
+
+    localparam op_alu     = 2'd0;
+    localparam op_mem     = 2'd1;
+    localparam op_muldiv  = 2'd2;
+
+    wire is_A_load_Dhl = ( csA[`PARC_INST_MSG_MEM_REQ] == ld );
+    wire is_A_muldiv_Dhl = ( csA[`PARC_INST_MSG_MULDIV_EN] );
+
+
+    reg [8:0] scoreboard  [31:0];
+    integer i;
+
+    always @ ( posedge clk ) begin
+      debug_reg = 0;
+      if ( reset ) begin
+        for (i = 0; i < 32; i = i + 1) scoreboard[i] <= 'b0;
+      end
+      else begin
+        for ( i=0; i<32; i=i+1 ) begin
+          // initial step
+            if ( inst_val_Dhl && !stall_X0hl && 
+              ( rfA_wen_Dhl && instA_rd_Dhl != 5'b0 && i == instA_rd_Dhl)) // pipeline A
+            begin
+              debug_reg <= i;
+
+              scoreboard[i][8] <= 1'b0;
+
+              if ( is_A_load_Dhl ) begin
+                scoreboard[i][7:6] <= op_mem;
+                scoreboard[i][5]   <= 1;
+              end
+              else if ( is_A_muldiv_Dhl ) begin
+                scoreboard[i][7:6] <= op_muldiv;
+                scoreboard[i][5]   <= 1;
+              end
+              else begin
+                scoreboard[i][7:6] <= op_alu;
+                scoreboard[i][5]   <= 0;
+              end
+
+              scoreboard[i][0] <= 1;
+            end
+            else begin
+              scoreboard[i][0] <= 0;
+            end
+
+          // update steps (haven't accounted for squashing?)
+            if ( !stall_X1hl ) begin
+              scoreboard[i][1] <= scoreboard[i][0];
+              if ( scoreboard[i][7:6] == op_mem && scoreboard[i][0] ) begin
+                scoreboard[i][5] <= 0;
+              end
+            end
+            else begin
+              scoreboard[i][1] <= scoreboard[i][1];
+            end
+            if ( !stall_X2hl ) begin
+              scoreboard[i][2] <= scoreboard[i][1];
+            end
+            else begin
+              scoreboard[i][2] <= scoreboard[i][2];
+            end
+            if ( !stall_X3hl ) begin
+              scoreboard[i][3] <= scoreboard[i][2];
+              if ( scoreboard[i][7:6] == op_muldiv && scoreboard[i][2] && !scoreboard[i][1] && !scoreboard[i][0]) begin
+                scoreboard[i][5] <= 0;
+              end
+            end
+            else begin
+              scoreboard[i][3] <= scoreboard[i][3];
+            end
+            if ( !stall_Whl ) begin
+              scoreboard[i][4] <= scoreboard[i][3];
+            end
+            else begin
+              scoreboard[i][4] <= scoreboard[i][4];
+            end
+        end
+      end
+    end
+
+    reg [5:0] debug_reg;
+
+    wire  [4:0] instA_rd_Dhl = rfA_waddr_Dhl;
+    wire  [4:0] instA_rs_Dhl = ( steering_mux_sel == 0 ) ? inst0_rs_Dhl : inst1_rs_Dhl;
+    wire  [4:0] instA_rt_Dhl = ( steering_mux_sel == 0 ) ? inst0_rt_Dhl : inst1_rt_Dhl;
+
+    reg [3:0] opA0_byp_mux_sel_Dhl;
+    always @(*) begin
+      if ( scoreboard[instA_rs_Dhl][8] == 1'b0 ) begin
+        if ( inst_val_X0hl && scoreboard[instA_rs_Dhl][0] )      opA0_byp_mux_sel_Dhl <= am_AX0_byp;
+        else if ( inst_val_X1hl && scoreboard[instA_rs_Dhl][1] ) opA0_byp_mux_sel_Dhl <= am_AX1_byp;
+        else if ( inst_val_X2hl && scoreboard[instA_rs_Dhl][2] ) opA0_byp_mux_sel_Dhl <= am_AX2_byp;
+        else if ( inst_val_X3hl && scoreboard[instA_rs_Dhl][3] ) opA0_byp_mux_sel_Dhl <= am_AX3_byp;
+        else if ( inst_val_Whl  && scoreboard[instA_rs_Dhl][4] ) opA0_byp_mux_sel_Dhl <= am_AW_byp;
+        else                                                     opA0_byp_mux_sel_Dhl <= am_r0;
+      end
+      else begin
+        if ( inst_val_X0hl && scoreboard[instA_rs_Dhl][0] )      opA0_byp_mux_sel_Dhl <= am_BX0_byp;
+        else if ( inst_val_X1hl && scoreboard[instA_rs_Dhl][1] ) opA0_byp_mux_sel_Dhl <= am_BX1_byp;
+        else if ( inst_val_X2hl && scoreboard[instA_rs_Dhl][2] ) opA0_byp_mux_sel_Dhl <= am_BX2_byp;
+        else if ( inst_val_X3hl && scoreboard[instA_rs_Dhl][3] ) opA0_byp_mux_sel_Dhl <= am_BX3_byp;
+        else if ( inst_val_Whl  && scoreboard[instA_rs_Dhl][4] ) opA0_byp_mux_sel_Dhl <= am_BW_byp;
+        else                                                     opA0_byp_mux_sel_Dhl <= am_r0;
+      end
+    end
+
+    reg [3:0] opA1_byp_mux_sel_Dhl;
+    always @(*) begin
+      if ( scoreboard[instA_rt_Dhl][8] == 1'b0 ) begin
+        if ( inst_val_X0hl && scoreboard[instA_rt_Dhl][0] )      opA1_byp_mux_sel_Dhl <= bm_AX0_byp;
+        else if ( inst_val_X1hl && scoreboard[instA_rt_Dhl][1] ) opA1_byp_mux_sel_Dhl <= bm_AX1_byp;
+        else if ( inst_val_X2hl && scoreboard[instA_rt_Dhl][2] ) opA1_byp_mux_sel_Dhl <= bm_AX2_byp;
+        else if ( inst_val_X3hl && scoreboard[instA_rt_Dhl][3] ) opA1_byp_mux_sel_Dhl <= bm_AX3_byp;
+        else if ( inst_val_Whl  && scoreboard[instA_rt_Dhl][4] ) opA1_byp_mux_sel_Dhl <= bm_AW_byp;
+        else                                                     opA1_byp_mux_sel_Dhl <= bm_r1;
+      end
+      else begin
+        if ( inst_val_X0hl && scoreboard[instA_rt_Dhl][0] )      opA1_byp_mux_sel_Dhl <= bm_BX0_byp;
+        else if ( inst_val_X1hl && scoreboard[instA_rt_Dhl][1] ) opA1_byp_mux_sel_Dhl <= bm_BX1_byp;
+        else if ( inst_val_X2hl && scoreboard[instA_rt_Dhl][2] ) opA1_byp_mux_sel_Dhl <= bm_BX2_byp;
+        else if ( inst_val_X3hl && scoreboard[instA_rt_Dhl][3] ) opA1_byp_mux_sel_Dhl <= bm_BX3_byp;
+        else if ( inst_val_Whl  && scoreboard[instA_rt_Dhl][4] ) opA1_byp_mux_sel_Dhl <= bm_BW_byp;
+        else                                                     opA1_byp_mux_sel_Dhl <= bm_r1;
+      end
+    end
+
 
   // ship instruction for field parsing to datapath
 
@@ -660,6 +803,13 @@ module parc_CoreCtrl
 
     wire       rs1_en_Dhl    = cs1[`PARC_INST_MSG_RS_EN];
     wire       rt1_en_Dhl    = cs1[`PARC_INST_MSG_RT_EN];
+
+
+    wire [4:0] rsA_addr_Dhl  = instA_rs_Dhl;
+    wire [4:0] rtA_addr_Dhl  = instA_rt_Dhl;
+
+    wire       rsA_en_Dhl    = csA[`PARC_INST_MSG_RS_EN];
+    wire       rtA_en_Dhl    = csA[`PARC_INST_MSG_RT_EN];
 
     // For Part 2 and Optionally Part 1, replace the following control logic with a scoreboard
 
@@ -817,13 +967,13 @@ module parc_CoreCtrl
       : (rt1_AW_byp_Dhl)  ? bm_AW_byp
       :                     bm_r1;
 
-    assign opA0_byp_mux_sel_Dhl 
-      = ( steering_mux_sel == 0 ) ? op00_byp_mux_sel_Dhl
-      :                             op10_byp_mux_sel_Dhl;
+    // assign opA0_byp_mux_sel_Dhl 
+    //   = ( steering_mux_sel == 0 ) ? op00_byp_mux_sel_Dhl
+    //   :                             op10_byp_mux_sel_Dhl;
 
-    assign opA1_byp_mux_sel_Dhl 
-      = ( steering_mux_sel == 0 ) ? op01_byp_mux_sel_Dhl
-      :                             op11_byp_mux_sel_Dhl;
+    // assign opA1_byp_mux_sel_Dhl 
+    //   = ( steering_mux_sel == 0 ) ? op01_byp_mux_sel_Dhl
+    //   :                             op11_byp_mux_sel_Dhl;
 
   // Operand Mux Select --> added opA0 / opA1 in addition to op00/01/10/11
 
@@ -992,9 +1142,10 @@ module parc_CoreCtrl
     wire stall_1_Dhl = (stall_X0hl || stall_1_muldiv_use_Dhl || stall_1_load_use_Dhl);
 
     wire stall_A_Dhl 
-      = ( steering_mux_sel == 1'b0 ) ? stall_0_Dhl
-      : ( steering_mux_sel == 1'b1 ) ? stall_1_Dhl
-      :                                1'bx;
+      = inst_val_Dhl && 
+          ((rsA_en_Dhl && scoreboard[instA_rs_Dhl][5]) 
+        || (rtA_en_Dhl && scoreboard[instA_rt_Dhl][5])
+        || (rfA_wen_Dhl && scoreboard[instA_rd_Dhl][5]));
 
     // i'm not really sure why adding the additional condition to the steering stall
     // fixed some kind of data error, but it doesn't work properly without !brj_taken
