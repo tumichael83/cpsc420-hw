@@ -661,17 +661,18 @@ module parc_CoreCtrl
     integer i;
 
     always @ ( posedge clk ) begin
-      debug_reg = 0;
       if ( reset ) begin
         for (i = 0; i < 32; i = i + 1) scoreboard[i] <= 'b0;
       end
       else begin
         for ( i=0; i<32; i=i+1 ) begin
           // initial step
-            if ( inst_val_Dhl && !stall_X0hl && 
+            if (stall_X0hl) begin
+              scoreboard[i][0] <= scoreboard[i][0];
+            end
+            else if ( inst_val_Dhl && 
               ( rfA_wen_Dhl && instA_rd_Dhl != 5'b0 && i == instA_rd_Dhl)) // pipeline A
             begin
-              debug_reg <= i;
 
               scoreboard[i][8] <= 1'b0;
 
@@ -729,17 +730,23 @@ module parc_CoreCtrl
       end
     end
 
+    wire [8:0] temp2 = scoreboard[2];
+    wire [8:0] temp4 = scoreboard[4];
+
     reg [5:0] debug_reg;
 
     wire  [4:0] instA_rd_Dhl = rfA_waddr_Dhl;
     wire  [4:0] instA_rs_Dhl = ( steering_mux_sel == 0 ) ? inst0_rs_Dhl : inst1_rs_Dhl;
     wire  [4:0] instA_rt_Dhl = ( steering_mux_sel == 0 ) ? inst0_rt_Dhl : inst1_rt_Dhl;
 
+    wire debug_w = ( inst_val_X0hl && scoreboard[instA_rs_Dhl][0] );
     reg [3:0] opA0_byp_mux_sel_Dhl;
     always @(*) begin
+      debug_reg = 0;
       if ( scoreboard[instA_rs_Dhl][8] == 1'b0 ) begin
-        if ( inst_val_X0hl && scoreboard[instA_rs_Dhl][0] )      opA0_byp_mux_sel_Dhl <= am_AX0_byp;
-        else if ( inst_val_X1hl && scoreboard[instA_rs_Dhl][1] ) opA0_byp_mux_sel_Dhl <= am_AX1_byp;
+        debug_reg = 1;
+        if ( inst_val_X0hl && scoreboard[instA_rs_Dhl][0] )      begin opA0_byp_mux_sel_Dhl <= am_AX0_byp; debug_reg = 3; end
+        else if ( inst_val_X1hl && scoreboard[instA_rs_Dhl][1] ) begin opA0_byp_mux_sel_Dhl <= am_AX1_byp; debug_reg = 2; end
         else if ( inst_val_X2hl && scoreboard[instA_rs_Dhl][2] ) opA0_byp_mux_sel_Dhl <= am_AX2_byp;
         else if ( inst_val_X3hl && scoreboard[instA_rs_Dhl][3] ) opA0_byp_mux_sel_Dhl <= am_AX3_byp;
         else if ( inst_val_Whl  && scoreboard[instA_rs_Dhl][4] ) opA0_byp_mux_sel_Dhl <= am_AW_byp;
@@ -1141,11 +1148,21 @@ module parc_CoreCtrl
     wire stall_0_Dhl = (stall_X0hl || stall_0_muldiv_use_Dhl || stall_0_load_use_Dhl);
     wire stall_1_Dhl = (stall_X0hl || stall_1_muldiv_use_Dhl || stall_1_load_use_Dhl);
 
-    wire stall_A_Dhl 
-      = inst_val_Dhl && 
+    wire stall_A_sb_Dhl 
+      = stall_X0hl 
+      || (inst_val_Dhl && 
           ((rsA_en_Dhl && scoreboard[instA_rs_Dhl][5]) 
         || (rtA_en_Dhl && scoreboard[instA_rt_Dhl][5])
-        || (rfA_wen_Dhl && scoreboard[instA_rd_Dhl][5]));
+        || (rfA_wen_Dhl && scoreboard[instA_rd_Dhl][5])));
+
+    wire stall_A_Dhl
+      = (steering_mux_sel == 1'b0) ? stall_0_Dhl
+      :                              stall_1_Dhl;
+
+    wire check_A0_byp = ( steering_mux_sel == 1'b0 ) ? opA0_byp_mux_sel_Dhl == op00_byp_mux_sel_Dhl : opA0_byp_mux_sel_Dhl == op10_byp_mux_sel_Dhl;
+    wire check_A1_byp = ( steering_mux_sel == 1'b0 ) ? opA1_byp_mux_sel_Dhl == op01_byp_mux_sel_Dhl : opA1_byp_mux_sel_Dhl == op11_byp_mux_sel_Dhl;
+
+    wire check_stall_A_Dhl = (stall_A_Dhl == stall_A_sb_Dhl);
 
     // i'm not really sure why adding the additional condition to the steering stall
     // fixed some kind of data error, but it doesn't work properly without !brj_taken
