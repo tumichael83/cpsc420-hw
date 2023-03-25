@@ -650,6 +650,7 @@ module parc_CoreCtrl
     = !jump_hazard_Dhl &&
     ( op0_op1_RAW_Dhl 
     || op0_op1_WAW_Dhl 
+    || (cs0[`PARC_INST_MSG_BR_SEL] != br_none)
     || ( !op0_is_alu && !op1_is_alu ));
 
   wire jump_hazard_Dhl = cs0[`PARC_INST_MSG_J_EN];
