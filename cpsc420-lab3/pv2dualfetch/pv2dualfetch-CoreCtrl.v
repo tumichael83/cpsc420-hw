@@ -667,10 +667,7 @@ module parc_CoreCtrl
       else begin
         for ( i=0; i<32; i=i+1 ) begin
           // initial step
-            if (stall_X0hl) begin
-              scoreboard[i][0] <= scoreboard[i][0];
-            end
-            else if ( inst_val_Dhl && 
+            if ( inst_val_Dhl && !stall_X0hl &&
               ( rfA_wen_Dhl && instA_rd_Dhl != 5'b0 && i == instA_rd_Dhl)) // pipeline A
             begin
 
@@ -690,6 +687,9 @@ module parc_CoreCtrl
               end
 
               scoreboard[i][0] <= 1;
+            end
+            else if (stall_X0hl) begin
+              scoreboard[i][0] <= scoreboard[i][0];
             end
             else begin
               scoreboard[i][0] <= 0;
