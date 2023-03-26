@@ -1149,11 +1149,10 @@ module parc_CoreCtrl
     wire stall_1_Dhl = (stall_X0hl || stall_1_muldiv_use_Dhl || stall_1_load_use_Dhl);
 
     wire stall_A_sb_Dhl 
-      = stall_X0hl 
-      || (inst_val_Dhl && 
+      = inst_val_Dhl && 
           ((rsA_en_Dhl && scoreboard[instA_rs_Dhl][5]) 
         || (rtA_en_Dhl && scoreboard[instA_rt_Dhl][5])
-        || (rfA_wen_Dhl && scoreboard[instA_rd_Dhl][5])));
+        || (rfA_wen_Dhl && scoreboard[instA_rd_Dhl][5]));
 
     wire stall_A_Dhl
       = (steering_mux_sel == 1'b0) ? stall_0_Dhl
@@ -1174,7 +1173,7 @@ module parc_CoreCtrl
       //&& inst_valX0hl );
 
     // I'm pretty sure we're not stalling properly for muldiv instructions
-    wire stall_Dhl = stall_A_Dhl || stall_steer_Dhl;
+    wire stall_Dhl = stall_X0hl || stall_A_Dhl || stall_steer_Dhl;
 
     // Next bubble bit
 

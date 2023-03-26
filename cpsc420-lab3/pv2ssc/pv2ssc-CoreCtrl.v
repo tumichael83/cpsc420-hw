@@ -632,7 +632,7 @@ module parc_CoreCtrl
   reg [1:0] pipe_B_mux_sel;
 
   wire stall_non_steer 
-    = stall_A_Dhl || stall_B_Dhl ;
+    = stall_A_Dhl || stall_B_Dhl || stall_X0hl ;
 
   reg [cs_sz-1:0] csA;        // instruction decode signals
   reg [cs_sz-1:0] csB;
@@ -652,6 +652,13 @@ module parc_CoreCtrl
     || op0_op1_WAW_Dhl 
     || (cs0[`PARC_INST_MSG_BR_SEL] != br_none)
     || ( !op0_is_alu && !op1_is_alu ));
+  
+  wire sing_pipe_Dhl
+    =  inst_val_Dhl 
+    && internal_hazard_Dhl 
+    && stall_steer 
+    && !brj_taken_X0hl
+    && !stall_X0hl;
 
   wire jump_hazard_Dhl = cs0[`PARC_INST_MSG_J_EN];
 
@@ -668,7 +675,7 @@ module parc_CoreCtrl
       if ( stall_non_steer ) begin
         stall_steer <= stall_steer;
       end
-      else if ( inst_val_Dhl && internal_hazard_Dhl && stall_steer && !brj_taken_X0hl) begin
+      else if ( sing_pipe_Dhl ) begin
         stall_steer <= 0;
       end
       else begin
@@ -768,22 +775,33 @@ module parc_CoreCtrl
     wire is_A_load_Dhl = ( csA[`PARC_INST_MSG_MEM_REQ] == ld );
     wire is_A_muldiv_Dhl = ( csA[`PARC_INST_MSG_MULDIV_EN] );
 
+    reg debug_reg_2;
 
     reg [8:0] scoreboard  [31:0];
+    reg new_A;
+    reg new_B;
     integer i;
 
+  wire new_a_out = inst_val_Dhl && !stall_X0hl && 
+              ( rfA_wen_Dhl && instA_rd_Dhl != 5'b0 );
+
     always @ ( posedge clk ) begin
-      debug_reg = 0;
+      debug_reg_2 = 0;
       if ( reset ) begin
         for (i = 0; i < 32; i = i + 1) scoreboard[i] <= 'b0;
       end
       else begin
         for ( i=0; i<32; i=i+1 ) begin
           // initial step
-            if ( inst_val_Dhl && !stall_X0hl && 
-              ( rfA_wen_Dhl && instA_rd_Dhl != 5'b0 && i == instA_rd_Dhl)) // pipeline A
+            new_A 
+              = inst_val_Dhl && !stall_X0hl && 
+              ( rfA_wen_Dhl && instA_rd_Dhl != 5'b0 && i == instA_rd_Dhl);
+
+            new_B
+              = inst_val_Dhl && !stall_X0hl && 
+              ( rfB_wen_Dhl && instB_rd_Dhl != 5'b0 && i == instB_rd_Dhl);
+            if ( new_A ) // pipeline A
             begin
-              debug_reg <= i;
 
               scoreboard[i][8] <= 1'b0;
 
@@ -802,22 +820,25 @@ module parc_CoreCtrl
 
               scoreboard[i][0] <= 1;
             end
-            else if ( inst_val_Dhl && !stall_X0hl && 
-              ( rfB_wen_Dhl && instB_rd_Dhl != 5'b0 && i == instB_rd_Dhl)) // pipeline B
+            else if (new_B) // pipeline B
             begin
-              scoreboard[i][8] <= 1'b1;
-              scoreboard[i][7:6] <= op_alu;
-              scoreboard[i][5] <= 1'b0;
-              scoreboard[i][0] <= 1;
+              scoreboard[i][8]    <= 1'b1;
+              scoreboard[i][7:6]  <= op_alu;
+              scoreboard[i][5]    <= 1'b0;
+              scoreboard[i][0]    <= 1;
+            end
+            else if ( stall_X0hl ) begin
+              scoreboard[i][0]    <= scoreboard[i][0];
             end
             else begin
-              scoreboard[i][0] <= 0;
+              scoreboard[i][0]    <= 0;
             end
 
           // update steps (haven't accounted for squashing?)
             if ( !stall_X1hl ) begin
               scoreboard[i][1] <= scoreboard[i][0];
-              if ( scoreboard[i][7:6] == op_mem && scoreboard[i][0] ) begin
+              if ( scoreboard[i][7:6] == op_mem 
+                  && !(stall_X0hl && !scoreboard[i][5]) && !new_A) begin
                 scoreboard[i][5] <= 0;
               end
             end
@@ -848,8 +869,6 @@ module parc_CoreCtrl
         end
       end
     end
-
-    reg [5:0] debug_reg;
 
     wire  [4:0] instA_rd_Dhl = rfA_waddr_Dhl;
     wire  [4:0] instA_rs_Dhl = ( pipe_A_mux_sel == op0 ) ? inst0_rs_Dhl : inst1_rs_Dhl;
@@ -900,8 +919,11 @@ module parc_CoreCtrl
       end
     end
 
+    reg [5:0] debug_reg;
+
     reg [3:0] opB0_byp_mux_sel_Dhl;
     always @(*) begin
+      debug_reg = 0;
       if ( scoreboard[instB_rs_Dhl][8] == 1'b0 ) begin
         if ( inst_val_X0hl && scoreboard[instB_rs_Dhl][0] )      opB0_byp_mux_sel_Dhl <= am_AX0_byp;
         else if ( inst_val_X1hl && scoreboard[instB_rs_Dhl][1] ) opB0_byp_mux_sel_Dhl <= am_AX1_byp;
@@ -941,7 +963,11 @@ module parc_CoreCtrl
     end
 
 
+  wire [8:0] temp4 = scoreboard[4];
   wire [8:0] temp2 = scoreboard[2];
+  wire [8:0] temp6 = scoreboard[6];
+  wire [8:0] temp7 = scoreboard[7];
+  wire [8:0] temp3 = scoreboard[3];
 
   // ship instruction for field parsing to datapath
 
@@ -1314,20 +1340,42 @@ module parc_CoreCtrl
     wire stall_0_Dhl = (stall_X0hl || stall_0_muldiv_use_Dhl || stall_0_load_use_Dhl);
     wire stall_1_Dhl = (stall_X0hl || stall_1_muldiv_use_Dhl || stall_1_load_use_Dhl);
 
-    wire stall_A_Dhl 
+    wire stall_A_sb_Dhl 
       = inst_val_Dhl && 
-          ((rsA_en_Dhl && scoreboard[instA_rs_Dhl][5]) 
+          ( stall_X0hl
+        || (rsA_en_Dhl && scoreboard[instA_rs_Dhl][5]) 
         || (rtA_en_Dhl && scoreboard[instA_rt_Dhl][5])
         || (rfA_wen_Dhl && scoreboard[instA_rd_Dhl][5]));
 
-    wire stall_B_Dhl 
+    wire stall_B_sb_Dhl 
       = inst_val_Dhl && 
-          ((rsB_en_Dhl && scoreboard[instB_rs_Dhl][5]) 
+          (stall_X0hl
+        || (rsB_en_Dhl && scoreboard[instB_rs_Dhl][5]) 
         || (rtB_en_Dhl && scoreboard[instB_rt_Dhl][5]) 
         || (rfB_wen_Dhl && scoreboard[instB_rd_Dhl][5]));
 
-    wire stall_Dhl = stall_A_Dhl || stall_B_Dhl 
-                  || (inst_val_Dhl && (internal_hazard_Dhl && stall_steer == 1));
+    wire stall_sing_pipe_Dhl
+    = (inst_val_Dhl && (internal_hazard_Dhl && stall_steer == 1));
+
+    wire stall_A_Dhl
+      = (pipe_A_mux_sel == op0)   ? stall_0_Dhl
+      : (pipe_A_mux_sel == op1)   ? stall_1_Dhl
+      : (pipe_A_mux_sel == stall) ? 1'b0
+      :                             1'b0;
+
+    wire stall_B_Dhl
+      = (pipe_B_mux_sel == op0)   ? stall_0_Dhl
+      : (pipe_B_mux_sel == op1)   ? stall_1_Dhl
+      : (pipe_B_mux_sel == stall) ? 1'b0
+      :                             1'b0;
+
+    wire check_stall_A_Dhl = stall_A_Dhl == stall_A_sb_Dhl;
+
+    wire stall_Dhl 
+      = stall_X0hl
+     || stall_A_Dhl 
+     || stall_B_Dhl 
+     || stall_sing_pipe_Dhl;
 
     // Next bubble bit
 
@@ -1903,7 +1951,7 @@ module parc_CoreCtrl
 
         // Count instructions for every cycle not squashed or stalled
 
-        if ( inst_val_Dhl && !stall_A_Dhl && !stall_B_Dhl ) begin
+        if ( inst_val_Dhl && !stall_A_Dhl && !stall_B_Dhl && !stall_X0hl) begin
           num_inst = num_inst + 2;
         end
 
