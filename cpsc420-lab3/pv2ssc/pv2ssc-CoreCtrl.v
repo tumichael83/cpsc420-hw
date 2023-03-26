@@ -632,7 +632,7 @@ module parc_CoreCtrl
   reg [1:0] pipe_B_mux_sel;
 
   wire stall_non_steer 
-    = stall_A_Dhl || stall_B_Dhl || stall_X0hl ;
+    = stall_A_sb_Dhl || stall_B_sb_Dhl || stall_X0hl ;
 
   reg [cs_sz-1:0] csA;        // instruction decode signals
   reg [cs_sz-1:0] csB;
@@ -1357,6 +1357,7 @@ module parc_CoreCtrl
     wire stall_sing_pipe_Dhl
     = (inst_val_Dhl && (internal_hazard_Dhl && stall_steer == 1));
 
+    // use these two to check
     wire stall_A_Dhl
       = (pipe_A_mux_sel == op0)   ? stall_0_Dhl
       : (pipe_A_mux_sel == op1)   ? stall_1_Dhl
@@ -1373,13 +1374,13 @@ module parc_CoreCtrl
 
     wire stall_Dhl 
       = stall_X0hl
-     || stall_A_Dhl 
-     || stall_B_Dhl 
+     || stall_A_sb_Dhl 
+     || stall_B_sb_Dhl 
      || stall_sing_pipe_Dhl;
 
     // Next bubble bit
 
-    wire bubble_sel_Dhl  = ( squash_Dhl || stall_A_Dhl || stall_B_Dhl );
+    wire bubble_sel_Dhl  = ( squash_Dhl || stall_A_sb_Dhl || stall_B_sb_Dhl );
     wire bubble_next_Dhl = ( !bubble_sel_Dhl ) ? bubble_Dhl
                          : ( bubble_sel_Dhl  ) ? 1'b1
                          :                       1'bx;
