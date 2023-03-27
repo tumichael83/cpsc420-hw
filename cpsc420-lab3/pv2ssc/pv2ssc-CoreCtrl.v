@@ -1952,8 +1952,8 @@ module parc_CoreCtrl
 
         // Count instructions for every cycle not squashed or stalled
 
-        if ( inst_val_Dhl && !stall_A_Dhl && !stall_B_Dhl && !stall_X0hl) begin
-          num_inst = num_inst + 2;
+        if ( inst_val_Dhl && !stall_A_Dhl && !stall_B_Dhl ) begin
+          num_inst = (pipe_A_mux_sel != stall && pipe_B_mux_sel != stall) ? num_inst + 2 : num_inst+1;
         end
 
       end
