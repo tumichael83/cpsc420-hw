@@ -1,0 +1,159 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage{amsmath}
+\usepackage{amsfonts, amsthm, amssymb} % this has the proof environment
+\usepackage[top=1in, bottom=1in, left=.8in, right=.8in]{geometry} % good margins
+
+% images 
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+
+%verilog code
+\usepackage{xcolor}
+\usepackage{listings}
+\definecolor{vgreen}{RGB}{104,180,104}
+\definecolor{vblue}{RGB}{49,49,255}
+\definecolor{vorange}{RGB}{255,143,102}
+
+\lstdefinestyle{verilog-style}
+{
+    language=Verilog,
+    basicstyle=\small\ttfamily,-
+    keywordstyle=\color{vblue},
+    identifierstyle=\color{black},
+    commentstyle=\color{vgreen},
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    numbersep=10pt,
+    tabsize=8,
+    moredelim=*[s][\colorIndex]{[}{]},
+    literate=*{:}{:}1
+}
+
+\makeatletter
+\newcommand*\@lbracket{[}
+\newcommand*\@rbracket{]}
+\newcommand*\@colon{:}
+\newcommand*\colorIndex{%
+    \edef\@temp{\the\lst@token}%
+    \ifx\@temp\@lbracket \color{black}%
+    \else\ifx\@temp\@rbracket \color{black}%
+    \else\ifx\@temp\@colon \color{black}%
+    \else \color{vorange}%
+    \fi\fi\fi
+}
+\makeatother
+
+\usepackage{trace}
+
+\newcommand{\paren}[1]{\left(#1\right )}
+\newcommand{\set}[1]{\left \{#1\right \}}
+\newcommand{\R}[0]{\mathbb R}
+\newcommand{\Z}[0]{\mathbb Z}
+\newcommand{\de}[0]{\text{\normalfont d}}
+\newcommand{\mycomment}[1]{}
+
+
+\begin{document}
+
+\title{\vspace*{-.9in}Lab 3: Superscalar parcv2 procesor}
+\author{Michael Tu}
+\maketitle
+\hrule
+
+\section{Abstract}
+The purpose of this lab was to implement a pipelined superscalar processor as well as to implement the scoreboarding out-of-order execution technique for the PARCv2 instruction set. This processor fetches 2 instructions at once has 2 pipelined functional units - unit A can execute any instruction; unit B can only execute alu instructions. Therefore, the processor is capable of executing 2 instructions in 1 cycle, provided that the instructions do not have any dependencies between them. For instructions with dependencies, we follow the simplest option of stalling the dependent instruction 1 cycle until it can proceed down the pipeline.
+
+\section{Design Considerations:}
+\textbf{Section 1:} Section 1 required implementing steering logic for a parcv2 processor that fetches two instructions at once. This requires implementing simple steering logic. The processor must always stall for at least 1 clock cycle in the decode stage. It switches every clock cycle between issuing the first and second instructions it fetches, unless it was forced to stall in order to wait for its arguments. Compared to the previous bypassed processor, this processor required duplicating much of the bypass and stall logic to account for whether the instruction in flight was the first or second instruction fetched. Having bypass and stall logic for both instructions, it was required to select the correct piece of bypass logic to use for each clock cycle.
+\\ \\
+\textbf{Section 2:} Section 2 required implementing scoreboard logic as well as superscalar processing for 2 instructions simultaneously. 
+
+Scoreboard logic is an alternative to bypassing. A scoreboard is a datastructure that tracks the status of the values being written to any individual register at each clock cycle. With a scoreboard, bypassing and stalling can be calculated easily by simply reading the scoreboard. Each of the 32 registers in the PARCv2 instruction set has its own entry in the scoreboard. Each entry contains the following fields: 
+\begin{itemize}
+\item Pipeline -- pipeline A or pipeline B
+\item Instruction type -- ALU, memory, or muldiv
+Instruction type is used to determine which stage the value is ready to be bypassed from.
+
+\item Pending / Busy -- has the required value been calculated yet
+\item Current Stage -- which stage the most recent value of the register is in
+\end{itemize}
+
+\includegraphics[scale=.08]{scoreboard}
+
+On each clock cycle, the scoreboard updates. If an instruction is issued into the X0 stage of either pipeline, it updates the pipeline, instruction type, pending, and current stage fields of the proper entry in the scoreboard. If the next stage is not then the scoreboard sets the bit in the following field. For example: the current stage might go from 00001 to 00010. If a new value is being computed into the register before the old value is completed, it overwrites the pipeline, instruction type, and pending fields. However, it does not clear out old values in the current stage. Bypassing then relies on using the value closest to the head of the pipeline. 
+
+The next part of the assignment was to implement two simultaneous pipelines. This required building on the previous steering logic from section 1. As before, we needed to use two sets of stall signals. One for each of the instructions in the pipeline. The pipeline will stall if either of the inflight instructions is stalled. However, we must also check for inter-instruction dependency, in which case, both instructions are sent, in-order, down pipeline A. Both instructions are passed to pipeline A because pipeline A can perform any type of operation. 
+
+
+\section{Testing}
+My assembly test was the following two instructions:
+
+\begin{center}
+\texttt{addiu \$2, 0 }
+
+\texttt{addiu \$2, 1}
+\end{center}
+
+In this case, the pipeline detects a WAW hazard and stalls to allow the first addiu to complete before allowing the second to proceed, even though it is possible to execute two addiu instructions simultaneously. Something that I would like to work on in my testing process is the use of temporary wires to check values are being read like I expect.
+
+\section{Evaluation}
+The benchmark results are below
+
+\begin{center}
+\begin{tabular}{ |p{3cm}|p{3cm}|p{3cm}|p{4.5cm}|  }
+ \hline
+ \multicolumn{4}{|c|}{pv2Byp Results} \\
+ \hline
+ Benchmark & Cycles & Instructions & IPC  \\
+ \hline
+ vvadd & 473 & 455 & 0.961945 \\
+ cmplx-mult & 15312 & 1864 & 0.121735 \\
+ masked-filter & 13832 & 4499 & 0.325260 \\
+ bin-search & 1749 & 1279 & 0.731275 \\
+ \hline
+\end{tabular}
+\end{center}
+
+
+\begin{center}
+\begin{tabular}{ |p{3cm}|p{3cm}|p{3cm}|p{4.5cm}|  }
+ \hline
+ \multicolumn{4}{|c|}{pv2dualfetch Results} \\
+ \hline
+ Benchmark & Cycles & Instructions & IPC  \\
+ \hline
+ vvadd & 473 & 455 & 0.961945 \\
+ cmplx-mult & 2512 & 1864 & 0.742038 \\
+ masked-filter & 5658 & 4499 & 0.795157 \\
+ bin-search & 1664 & 1279 & 0.768630 \\
+ \hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{ |p{3cm}|p{3cm}|p{3cm}|p{4.5cm}|  }
+ \hline
+ \multicolumn{4}{|c|}{pv2ssc	 Results} \\
+ \hline
+ Benchmark & Cycles & Instructions & IPC  \\
+ \hline
+ vvadd & 367 & 454 & 1.237057 \\
+ cmplx-mult & 2333 & 1863 & 0.798543 \\
+ masked-filter & 4611 & 4500 & 0.975927 \\
+ bin-search & 1492 & 1277 & 0.855898 \\
+ \hline
+\end{tabular}
+\end{center}
+\section{Discussion}
+From the benchmarks we can see that although superscalar processors undeniably outperform stalling and bypassed based processors, their improvements are hampered by the amount of dependencies between adjacent instructions. For example in cmplx-mult there are lots of dependencies (probably because a register is used to store the real and non-real parts, so there are lots of writes to and reads from the same register). On the other hand in a benchmark like vvadd, there is significant improvement because the different entries in a vector do not depend upon each other. 
+
+\section{Figures}
+This is the datapath for part 1, the important difference is the addition of the expanded instruction fetch and the steering logic.
+
+\includegraphics[scale=0.07]{dpath1}
+
+This is the datapath for part 2, the important difference is the addition of an additional pipeline
+
+\includegraphics[scale=0.09]{ssc-dpath}
+
+\end{document}
